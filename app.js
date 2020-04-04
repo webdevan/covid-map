@@ -1,5 +1,7 @@
 main();
 
+const mapType = 'count';
+
 function fetchCsv(url) {
   return fetch(url)
   .then(res => res.text())
@@ -69,7 +71,11 @@ async function main () {
   console.log(date);
   const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' })
   .format(new Date(date));
-  document.querySelector('.map-title').innerHTML = `New Covid-19 infections in South Africa on ${dateString}`;
+  if (mapType === 'change') {
+    document.querySelector('.map-title').innerHTML = `New Covid-19 infections in South Africa on ${dateString}`;
+  } else if (mapType === 'count') {
+    document.querySelector('.map-title').innerHTML = `All Covid-19 infections in South Africa on ${dateString}`;
+  }
 
   areas.forEach(area => {
 
@@ -108,14 +114,13 @@ async function main () {
     poly.addTo(map);
 
     // draw map marker
-    const type = 'change';
     let label = area.count;
     let size = 30;
-    if (type === 'count') {
+    if (mapType === 'count') {
       if (area.count === 0) return;
       label = area.count;
       size += area.count / 10;
-    } else if (type === 'change') {
+    } else if (mapType === 'change') {
       if (area.change === 0) return;
       label = `${area.change > 0 ? '+' : '-'}${area.change}`;
       size += Math.pow(area.change, 1.75) / 2;
