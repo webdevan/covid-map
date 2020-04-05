@@ -75,11 +75,11 @@ async function main () {
   const lastDate = columns.pop();
   const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(date));
   if (mapType === 'count') {
-    document.querySelector('.map-title').innerHTML = `All cases in South Africa as of ${dateString}`;
+    document.querySelector('.map-title').innerHTML = `All cases in South Africa (${dateString})`;
   } else if (mapType === 'change') {
-    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa on ${dateString}`;
+    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString})`;
   } else if (mapType === 'percentageChange') {
-    document.querySelector('.map-title').innerHTML = `Percentage change in cases in South Africa for ${dateString}`;
+    document.querySelector('.map-title').innerHTML = `Percentage change in cases in South Africa (${dateString})`;
   }
 
   regions.forEach(region => {
