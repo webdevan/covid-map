@@ -4,15 +4,19 @@
     <title>Covid-19 map of South Africa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous" />
     <link rel="stylesheet" href="app.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162862130-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-162862130-1');
+    </script>
   </head>
   <body>
-
     <div id="map"></div>
-    
     <div id="hud">
       <p class="map-title">Loading...</p>
     </div>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js" integrity="sha256-fNoRrwkP2GuYPbNSJmMJOCyfRB2DhPQe0rGTgzRsyso=" crossorigin="anonymous"></script>
     <script src="app.js"></script>
   </body>
