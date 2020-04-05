@@ -79,7 +79,7 @@ async function main () {
   } else if (mapType === 'change') {
     document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString})`;
   } else if (mapType === 'percentageChange') {
-    document.querySelector('.map-title').innerHTML = `Percentage change in cases in South Africa (${dateString})`;
+    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString})`;
   }
 
   regions.forEach(region => {
