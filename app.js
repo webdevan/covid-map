@@ -5,12 +5,13 @@ const mapType = 'count';
 function fetchCsv(url) {
   return fetch(url)
   .then(res => res.text())
+  .then(res => res.trim())
   .then(res => res.split('\n'))
   .then(res => res.map(item => item.split(',')))
   .then(res => {
     const headings = res.shift();
     return res.map(values => headings.reduce((item, key, index) => {
-      item[key] = isNaN(values[index]) ? values[index] : +values[index];
+      item[key] = values[index] === '' ? null : isNaN(values[index]) ? values[index] : +values[index];
       return item;
     }, {}));
   });
@@ -64,13 +65,11 @@ async function main () {
   let date;
   while (!date && columns.length) {
     date = columns.pop();
-    if (!infections.some(item => typeof item[date] !== 'number')) date = null;
+    if (infections.some(item => typeof item[date] !== 'number')) date = null;
   };
-  if (!date) return alert('Oops. Incomplete data set!');
+  if (!date) return alert('Oops. Invalid data set!');
   const lastDate = columns.pop();
-  console.log(date);
-  const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' })
-  .format(new Date(date));
+  const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(date));
   if (mapType === 'change') {
     document.querySelector('.map-title').innerHTML = `New Covid-19 infections in South Africa on ${dateString}`;
   } else if (mapType === 'count') {
