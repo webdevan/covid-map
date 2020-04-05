@@ -1,4 +1,4 @@
-area_id,area_name,area,population,map_file,map_index
+region_id,region_name,area,population,map_file,map_index
 UNKNOWN,Unknown,,,,
 EC,Eastern Cape,168966,6712276,map_provinces_za,0
 FS,Free State,129825,2887465,map_provinces_za,1

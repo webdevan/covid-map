@@ -26,7 +26,7 @@ function fetchJson(url) {
 
 async function fetchData() {
   return Promise.all([
-    fetchCsv('/data/areas_za.csv'),
+    fetchCsv('/data/regions_za.csv'),
     fetchCsv('/data/infections_timeline_za.csv'),
     fetchJson('/data/map_provinces_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
@@ -57,7 +57,7 @@ async function main () {
 
   // processData
   const [
-    areas,
+    regions,
     infections,
     provincesZa,
     subdistrictsZa,
@@ -82,12 +82,12 @@ async function main () {
     document.querySelector('.map-title').innerHTML = `Percentage change in cases in South Africa for ${dateString}`;
   }
 
-  areas.forEach(area => {
+  regions.forEach(region => {
 
     // assign infections stats
-    areaData = infections.find(item => item.area_id === area.area_id);
-    area.count = areaData[date];
-    area.change = areaData[date] - areaData[lastDate];
+    regionData = infections.find(item => item.region_id === region.region_id);
+    region.count = regionData[date];
+    region.change = regionData[date] - regionData[lastDate];
 
     // assign map polygon
     const maps = {
@@ -95,49 +95,49 @@ async function main () {
       map_subdistricts_za: subdistrictsZa,
       map_subdistricts_cpt: subdistrictsCpt,
     };
-    if (['WC', 'CPT'].includes(area.area_id)) return;
-    if (maps[area.map_file]) area.map = maps[area.map_file].geometries[area.map_index];
-    if (!area.map) return;
+    if (['WC', 'CPT'].includes(region.region_id)) return;
+    if (maps[region.map_file]) region.map = maps[region.map_file].geometries[region.map_index];
+    if (!region.map) return;
 
     // draw map polygon
-    // const weightedCount = area.count;
-    const weightedCount = area.count / area.population * 1000000;
-    // const weightedCount = area.count / area.area * 1000;
-    // const weightedCount = Math.pow(area.count / area.area, 0.75) * 1000;
+    // const weightedCount = region.count;
+    const weightedCount = region.count / region.population * 1000000;
+    // const weightedCount = region.count / region.area * 1000;
+    // const weightedCount = Math.pow(region.count / region.area, 0.75) * 1000;
     const opacity = 0.1 * Math.sqrt(weightedCount) / 2;
     let points = [];
-    if (area.map.type === 'Polygon') {
-      points = area.map.coordinates[0].map(point => [point[1], point[0]]);
-    } else if (area.map.type === 'MultiPolygon') {
-      points = area.map.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
+    if (region.map.type === 'Polygon') {
+      points = region.map.coordinates[0].map(point => [point[1], point[0]]);
+    } else if (region.map.type === 'MultiPolygon') {
+      points = region.map.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
     }
     const poly = L.polygon(points, {
       color: '#cccccc44',
       fillColor: '#000000ff',
       fillOpacity: opacity,
     });
-    // poly.bindTooltip(`${area.count} +${area.change}`, {permanent: true, direction:"center"}).openTooltip();
+    // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
     poly.addTo(map);
 
     // draw map marker
     let size = 22;
     let color = '#ff000066';
-    let label = area.count;
+    let label = region.count;
     if (mapType === 'count') {
-      if (area.count === 0) return;
-      size = 30 + area.count / 10;
-      label = area.count;
+      if (region.count === 0) return;
+      size = 30 + region.count / 10;
+      label = region.count;
     } else if (mapType === 'change') {
-      if (area.change === 0) return;
-      size = 30 + Math.pow(Math.abs(area.change), 1.5) / 3;
-      if (area.change < 0) color = '#00ff0066';
-      label = `${area.change > 0 ? '+' : ''}${area.change}`;
+      if (region.change === 0) return;
+      size = 30 + Math.pow(Math.abs(region.change), 1.5) / 3;
+      if (region.change < 0) color = '#00ff0066';
+      label = `${region.change > 0 ? '+' : ''}${region.change}`;
     } else if (mapType === 'percentageChange') {
-      if (area.change === 0) return;
-      size = 50 + Math.pow(Math.abs(area.change), 1.5) / 3;
-      if (area.change < 0) color = '#00ff0066';
-      const percent = area.change / (area.count - area.change) * 100;
-      label = `${area.change > 0 ? '+' : ''}${Math.round(percent)}%`;
+      if (region.change === 0) return;
+      size = 50 + Math.pow(Math.abs(region.change), 1.5) / 3;
+      if (region.change < 0) color = '#00ff0066';
+      const percent = region.change / (region.count - region.change) * 100;
+      label = `${region.change > 0 ? '+' : ''}${Math.round(percent)}%`;
     } else return;
     const icon = L.divIcon({
       className: 'custom-div-icon',
