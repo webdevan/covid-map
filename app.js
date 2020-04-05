@@ -1,6 +1,8 @@
 main();
 
-const mapType = 'change';
+// const mapType = 'count';
+// const mapType = 'change';
+const mapType = 'percentageChange';
 
 function fetchCsv(url) {
   return fetch(url)
@@ -40,6 +42,8 @@ function createMap() {
   const map = L.map('map', {
     center: [-28.806460, 24.936116],
     zoom: 6,
+    minZoom: 5,
+    maxZoom: 11,
     attributionControl: false,
   });
   const tiles = new L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png').addTo(map);
@@ -70,10 +74,12 @@ async function main () {
   if (!date) return alert('Oops. Invalid data set!');
   const lastDate = columns.pop();
   const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(date));
-  if (mapType === 'change') {
-    document.querySelector('.map-title').innerHTML = `New Covid-19 infections in South Africa on ${dateString}`;
-  } else if (mapType === 'count') {
-    document.querySelector('.map-title').innerHTML = `All Covid-19 infections in South Africa as of ${dateString}`;
+  if (mapType === 'count') {
+    document.querySelector('.map-title').innerHTML = `All cases in South Africa as of ${dateString}`;
+  } else if (mapType === 'change') {
+    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa on ${dateString}`;
+  } else if (mapType === 'percentageChange') {
+    document.querySelector('.map-title').innerHTML = `Percentage change in cases in South Africa for ${dateString}`;
   }
 
   areas.forEach(area => {
@@ -95,8 +101,9 @@ async function main () {
 
     // draw map polygon
     // const weightedCount = area.count;
-    // const weightedCount = area.count / area.population * 1000000;
-    const weightedCount = Math.pow(area.count / area.area, 0.75) * 1000;
+    const weightedCount = area.count / area.population * 1000000;
+    // const weightedCount = area.count / area.area * 1000;
+    // const weightedCount = Math.pow(area.count / area.area, 0.75) * 1000;
     const opacity = 0.1 * Math.sqrt(weightedCount) / 2;
     let points = [];
     if (area.map.type === 'Polygon') {
@@ -113,18 +120,24 @@ async function main () {
     poly.addTo(map);
 
     // draw map marker
-    let label = area.count;
-    let size = 30;
+    let size = 22;
     let color = '#ff000066';
+    let label = area.count;
     if (mapType === 'count') {
       if (area.count === 0) return;
+      size = 30 + area.count / 10;
       label = area.count;
-      size += area.count / 10;
     } else if (mapType === 'change') {
       if (area.change === 0) return;
-      label = `${area.change > 0 ? '+' : ''}${area.change}`;
-      size += Math.pow(Math.abs(area.change), 1.5) / 3;
+      size = 30 + Math.pow(Math.abs(area.change), 1.5) / 3;
       if (area.change < 0) color = '#00ff0066';
+      label = `${area.change > 0 ? '+' : ''}${area.change}`;
+    } else if (mapType === 'percentageChange') {
+      if (area.change === 0) return;
+      size = 50 + Math.pow(Math.abs(area.change), 1.5) / 3;
+      if (area.change < 0) color = '#00ff0066';
+      const percent = area.change / (area.count - area.change) * 100;
+      label = `${area.change > 0 ? '+' : ''}${Math.round(percent)}%`;
     } else return;
     const icon = L.divIcon({
       className: 'custom-div-icon',
