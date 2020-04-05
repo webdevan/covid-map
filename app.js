@@ -1,6 +1,6 @@
 main();
 
-const mapType = 'count';
+const mapType = 'change';
 
 function fetchCsv(url) {
   return fetch(url)
@@ -73,7 +73,7 @@ async function main () {
   if (mapType === 'change') {
     document.querySelector('.map-title').innerHTML = `New Covid-19 infections in South Africa on ${dateString}`;
   } else if (mapType === 'count') {
-    document.querySelector('.map-title').innerHTML = `All Covid-19 infections in South Africa on ${dateString}`;
+    document.querySelector('.map-title').innerHTML = `All Covid-19 infections in South Africa as of ${dateString}`;
   }
 
   areas.forEach(area => {
@@ -115,21 +115,23 @@ async function main () {
     // draw map marker
     let label = area.count;
     let size = 30;
+    let color = '#ff000066';
     if (mapType === 'count') {
       if (area.count === 0) return;
       label = area.count;
       size += area.count / 10;
     } else if (mapType === 'change') {
       if (area.change === 0) return;
-      label = `${area.change > 0 ? '+' : '-'}${area.change}`;
-      size += Math.pow(area.change, 1.75) / 2;
+      label = `${area.change > 0 ? '+' : ''}${area.change}`;
+      size += Math.pow(Math.abs(area.change), 1.5) / 3;
+      if (area.change < 0) color = '#00ff0066';
     } else return;
     const icon = L.divIcon({
       className: 'custom-div-icon',
       html: `
       <div style='
       color: #ffffff;
-      background-color: #ff000066;
+      background-color: ${color};
       border-radius: 50%;
       text-align: center;
       font-size: 1em;
