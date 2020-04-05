@@ -1,15 +1,15 @@
 area_id,area_name,2020-03-29,2020-03-30,2020-03-31,2020-04-01,2020-04-02,2020-04-03,2020-04-04
-UNKNOWN,Unknown,100,96,90,90,94,94,13
-EC,Eastern Cape,12,12,12,15,17,21,
-FS,Free State,72,72,74,76,84,84,
-GP,Gauteng Province,584,618,633,645,663,672,
-KZN,Kwa-Zulu Natal,167,171,179,186,206,215,
-LP,Limpopo,12,11,14,14,16,16,
-MP,Mapumalanga,11,11,12,12,13,13,
-NW,North-West Province,6,3,6,7,7,7,
-NC,Northern Cape,6,8,8,9,9,9,
-WC,Western Cape,310,324,325,326,353,374,446
-CPT,City of Cape Town,256,,289,305,321,333,446
+UNKNOWN,Unknown,100,96,90,90,94,94,63
+EC,Eastern Cape,12,12,12,15,17,21,25
+FS,Free State,72,72,74,76,84,84,85
+GP,Gauteng Province,584,618,633,645,663,672,693
+KZN,Kwa-Zulu Natal,167,171,179,186,206,215,232
+LP,Limpopo,12,11,14,14,16,16,18
+MP,Mapumalanga,11,11,12,12,13,13,18
+NW,North-West Province,6,3,6,7,7,7,11
+NC,Northern Cape,6,8,8,9,9,9,7
+WC,Western Cape,310,324,325,326,353,374,433
+CPT,City of Cape Town,256,,289,305,321,333,347
 CT Eastern SD,Eastern,10,,14,15,17,17,19
 CT Khayelitsha SD,Khayelitsha,1,,1,1,2,2,2
 CT Klipfontein SD,Klipfontein,5,,7,8,9,12,15
