@@ -1,9 +1,9 @@
 main();
 
 // const mapType = 'none';
-// const mapType = 'count';
+const mapType = 'count';
 // const mapType = 'change';
-const mapType = 'percentageChange';
+// const mapType = 'percentageChange';
 
 function fetchCsv(url) {
   return fetch(url)
@@ -49,6 +49,14 @@ function createMap() {
   });
   const tiles = new L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png').addTo(map);
   return map;
+}
+
+function toRagColor(value) {
+  value = Math.min(1, Math.max(0, value));
+  const red = 128 + (value * (240 - 128));
+  const green = 112 + ((1 - value) * (208 - 112));
+  const blue = '70';
+  return `rgb(${red}, ${green}, ${blue})`;
 }
 
 async function main () {
@@ -101,9 +109,9 @@ async function main () {
     if (!region.map) return;
 
     // draw map polygon
-    // const weightedValue = 255 - Math.min(255, region.count);
-    const weightedValue = 255 - Math.min(255, Math.pow(region.count / region.population * 10000000, 0.8));
-    // const weightedValue = 255 - Math.min(255, region.count / region.area * 1000);
+    // const weightedValue = Math.min(255, region.count) / 255;
+    const weightedValue = Math.pow(region.count / region.population * 10000, 0.5);
+    // const weightedValue = Math.min(255, region.count / region.area * 1000) / 255;
     let points = [];
     if (region.map.type === 'Polygon') {
       points = region.map.coordinates[0].map(point => [point[1], point[0]]);
@@ -111,8 +119,8 @@ async function main () {
       points = region.map.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
     }
     const poly = L.polygon(points, {
-      color: `rgba(150, 150, 150, 0.1)`,
-      fillColor: `rgba(${weightedValue}, ${weightedValue}, ${weightedValue}, 1)`,
+      color: `rgba(255, 255, 255, 0.25)`,
+      fillColor: toRagColor(weightedValue),
       fillOpacity: 0.5,
     });
     // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
@@ -125,6 +133,7 @@ async function main () {
     if (mapType === 'count') {
       if (region.count === 0) return;
       size = 22 + region.count / 10;
+      color = `#00000020`;
       label = region.count;
     } else if (mapType === 'change') {
       if (region.change === 0) return;
@@ -139,11 +148,12 @@ async function main () {
       label = `${percent > 0 ? '+' : ''}${Math.round(percent)}%`;
     } else return;
     const icon = L.divIcon({
-      className: 'custom-div-icon',
+      className: 'region-marker',
       html: `
       <div style='
-      color: #ffffff;
       background-color: ${color};
+      color: #ffffff;
+      text-shadow: 0px 0px 3px black, 0px 0px 2px black;
       border-radius: 50%;
       text-align: center;
       font-size: 1em;
