@@ -2,8 +2,8 @@ main();
 
 // const mapType = 'none';
 const mapType = 'count';
-// const mapType = 'change';
-// const mapType = 'percentageChange';
+// const mapType = 'change'; // broken
+// const mapType = 'percentageChange'; // broken
 
 function fetchCsv(url) {
   return fetch(url)
@@ -28,10 +28,13 @@ function fetchJson(url) {
 async function fetchData() {
   return Promise.all([
     fetchCsv('/data/regions_za.csv'),
-    fetchCsv('/data/infections_timeline_za.csv'),
     fetchJson('/data/map_provinces_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
     fetchJson('/data/map_subdistricts_cpt.json'),
+    // provinces data
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'),
+    // western capes data
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
   ])
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -67,51 +70,59 @@ async function main () {
   // processData
   const [
     regions,
-    infections,
     provincesZa,
     subdistrictsZa,
     subdistrictsCpt,
+    provincialInfections,
+    westernCapeInfections,
   ] = data;
 
   // determine latest data dates
-  const columns = Object.keys(infections[0]);
-  let date;
-  while (!date && columns.length) {
-    date = columns.pop();
-    if (infections.some(item => typeof item[date] !== 'number')) date = null;
+  let date, provincialData, westernCapeData;
+  for (let i = provincialInfections.length; i > 0; i--) {
+    provincialData = provincialInfections[i - 1];
+    if (Object.values(provincialData).some(item => item === null)) continue;
+    date = provincialData.date;
+    westernCapeData = westernCapeInfections.find(item => item.date === date);
+    if (!westernCapeData) continue;
+    if (Object.values(westernCapeData).some(item => item === null)) continue;
+    break;
   };
+  
   if (!date) return alert('Oops. Invalid data set!');
-  const lastDate = columns.pop();
-  const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(date));
+  dateArray = date.split('-');
+  const dateString = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`));
+
+  // set map title
   if (mapType === 'count') {
-    document.querySelector('.map-title').innerHTML = `Confirmed cases in South Africa (${dateString})`;
+    document.querySelector('.map-title').innerHTML = `Confirmed cases in South Africa (${dateString}) | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
   } else if (mapType === 'change') {
-    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString})`;
+    return alert('BROKEN');
+    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString}) | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
   } else if (mapType === 'percentageChange') {
-    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString})`;
+    return alert('BROKEN');
+    document.querySelector('.map-title').innerHTML = `Increase in cases in South Africa (${dateString}) | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
   }
 
   regions.forEach(region => {
 
     // assign infections stats
-    regionData = infections.find(item => item.region_id === region.region_id);
-    region.count = regionData[date];
-    region.change = regionData[date] - regionData[lastDate];
-
+    region.count = provincialData[region.region_id] || westernCapeData[region.region_id];
+    // region.change = regionData[date] - regionData[lastDate]; // TODO
+    
     // assign map polygon
     const maps = {
       map_provinces_za: provincesZa,
       map_subdistricts_za: subdistrictsZa,
       map_subdistricts_cpt: subdistrictsCpt,
     };
-    if (['WC', 'CPT'].includes(region.region_id)) return;
+    if (['WC', 'CT'].includes(region.region_id)) return;
     if (maps[region.map_file]) region.map = maps[region.map_file].geometries[region.map_index];
     if (!region.map) return;
 
     // draw map polygon
-    // const weightedValue = Math.min(255, region.count) / 255;
-    const weightedValue = Math.pow(region.count / region.population * 10000, 0.5);
-    // const weightedValue = Math.min(255, region.count / region.area * 1000) / 255;
+    const weightedValue = region.count / region.population * 10000;
+    // const weightedValue = region.count / region.area * 100;
     let points = [];
     if (region.map.type === 'Polygon') {
       points = region.map.coordinates[0].map(point => [point[1], point[0]]);
