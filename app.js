@@ -5,6 +5,7 @@ var
   mapMarkers,
   mapPolygons,
   mapType,
+  mapTypeText,
   regions,
   provincesZa,
   subdistrictsZa,
@@ -84,10 +85,30 @@ function toRagColor(value) {
 function bindMapControls() {
   const mapTypeSelect = document.querySelector('.map-controls select');
   mapType = mapTypeSelect.value;
+  mapTypeText = mapTypeSelect.querySelector(`option[value="${mapType}"]`).innerHTML;
   mapTypeSelect.addEventListener('input', event => {
-   mapType = mapTypeSelect.value;
+    mapType = mapTypeSelect.value;
+    mapTypeText = mapTypeSelect.querySelector(`option[value="${mapType}"]`).innerHTML;
    changeMapType();
   }, false);
+}
+
+function determineDataDates() {
+  // determine latest data dates
+  let date;
+  for (let i = provincialInfections.length; i > 0; i--) {
+    provincialData = provincialInfections[i - 1];
+    if (Object.values(provincialData).some(item => item === null)) continue;
+    date = provincialData.date;
+    westernCapeData = westernCapeInfections.find(item => item.date === date);
+    if (!westernCapeData) continue;
+    if (Object.values(westernCapeData).some(item => item === null)) continue;
+    break;
+  };
+  if (!date) return alert('Oops. Invalid data set!');
+  dateArray = date.split('-');
+  const dataDate = new Date(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`);
+  dataDateText = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(dataDate);
 }
 
 function changeMapType() {
@@ -98,23 +119,42 @@ function changeMapType() {
   mapPolygons = [];
 
   // set map title
-  if (mapType === 'count') {
-    document.querySelector('.map-title').innerHTML = `Confirmed cases, ${dataDateText} | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
-  } else if (mapType === 'change') {
-    document.querySelector('.map-title').innerHTML = `New cases, ${dataDateText} | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
-  } else if (mapType === 'changePercent') {
-    document.querySelector('.map-title').innerHTML = `New cases (%), ${dataDateText} | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
-  }
+  document.querySelector('.map-title').innerHTML = `${mapTypeText}, ${dataDateText} | Source: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a>`;
 
-  const provincialDataYesterday = provincialInfections[provincialInfections.indexOf(provincialData) - 1];
-  const westernCapeDataYesterday = westernCapeInfections[westernCapeInfections.indexOf(westernCapeData) - 1];
+  const provincialDataIndex = provincialInfections.indexOf(provincialData);
+  const provincialDataHistory = [
+    provincialData,
+    provincialInfections[provincialDataIndex - 1],
+    provincialInfections[provincialDataIndex - 2],
+    provincialInfections[provincialDataIndex - 3],
+  ];
+
+  const westernCapeDataIndex = westernCapeInfections.indexOf(westernCapeData);
+  const westernCapeDataHistory = [
+    westernCapeData,
+    westernCapeInfections[westernCapeDataIndex - 1],
+    westernCapeInfections[westernCapeDataIndex - 2],
+    westernCapeInfections[westernCapeDataIndex - 3],
+  ];
+  
+  let historicDataIndex = 0;
+  if (['change', 'changePercent'].includes(mapType)) {
+    historicDataIndex = 1;
+  } else if (['change2days', 'changePercent2days'].includes(mapType)) {
+    historicDataIndex = 2;
+    mapType = mapType === 'change2days' ? 'change' : 'changePercent';
+  } else if (['change3days', 'changePercent3days'].includes(mapType)) {
+    historicDataIndex = 3;
+    mapType = mapType === 'change3days' ? 'change' : 'changePercent';
+  }  
+
   regions.forEach(region => {
 
     // assign infections stats
     region.count = provincialData[region.region_id] || westernCapeData[region.region_id];
-    region.countYesterday = provincialDataYesterday[region.region_id] || westernCapeDataYesterday[region.region_id];
-    region.change = region.count - region.countYesterday;
-    
+    const previousCount = provincialDataHistory[historicDataIndex][region.region_id] || westernCapeDataHistory[historicDataIndex][region.region_id];
+    region.change = region.count - previousCount;
+
     // assign map polygon
     const maps = {
       map_provinces_za: provincesZa,
@@ -188,28 +228,13 @@ function changeMapType() {
   });  
 }
 
-function determineDataDates() {
-  // determine latest data dates
-  let date;
-  for (let i = provincialInfections.length; i > 0; i--) {
-    provincialData = provincialInfections[i - 1];
-    if (Object.values(provincialData).some(item => item === null)) continue;
-    date = provincialData.date;
-    westernCapeData = westernCapeInfections.find(item => item.date === date);
-    if (!westernCapeData) continue;
-    if (Object.values(westernCapeData).some(item => item === null)) continue;
-    break;
-  };
-  if (!date) return alert('Oops. Invalid data set!');
-  dateArray = date.split('-');
-  const dataDate = new Date(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`);
-  dataDateText = new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(dataDate);
-}
-
 async function main () {
   bindMapControls();
   createMap();
   await fetchData();
+  // clean the data
+  provincialInfections = provincialInfections.filter(row => !Object.values(row).some(item => item === null));
+  westernCapeInfections = westernCapeInfections.filter(row => !Object.values(row).some(item => item === null));
   determineDataDates();
   changeMapType();
 }
