@@ -8,12 +8,15 @@ var
   mapTypeText,
   regions,
   provincesZa,
+  districtsZa,
   subdistrictsZa,
   subdistrictsCpt,
   provincialInfections,
   westernCapeInfections,
   provincialData,
   westernCapeData,
+  gautengData,
+  limpopoData,
   dataDateText;
 
 function fetchCsv(url) {
@@ -40,24 +43,33 @@ async function fetchData() {
   return Promise.all([
     fetchCsv('/data/regions_za.csv'),
     fetchJson('/data/map_provinces_za.json'),
+    fetchJson('/data/map_districts_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
     fetchJson('/data/map_subdistricts_cpt.json'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
   ])
   .then(res => {
     // set data variables
     [
       regions,
       provincesZa,
+      districtsZa,
       subdistrictsZa,
       subdistrictsCpt,
       provincialInfections,
       westernCapeInfections,
+      gautengInfections,
+      limpopoInfections,
     ] = res;
     // clean the data
-    provincialInfections = provincialInfections.filter(row => !Object.values(row).some(item => item === null));
-    westernCapeInfections = westernCapeInfections.filter(row => !Object.values(row).some(item => item === null));
+    const cleanData = data => data = data.filter(row => !Object.values(row).some(item => item === null));
+    cleanData(provincialInfections);
+    cleanData(westernCapeInfections);
+    cleanData(gautengInfections);
+    cleanData(limpopoInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -99,11 +111,16 @@ function determineLatestDataDate() {
   let date;
   for (let i = provincialInfections.length; i > 0; i--) {
     provincialData = provincialInfections[i - 1];
-    if (Object.values(provincialData).some(item => item === null)) continue;
     date = provincialData.date;
     westernCapeData = westernCapeInfections.find(item => item.date === date);
     if (!westernCapeData) continue;
-    if (Object.values(westernCapeData).some(item => item === null)) continue;
+    // for now use the last row
+    gautengData = gautengInfections[gautengInfections.length - 1];
+    limpopoData = limpopoInfections[gautengInfections.length - 1];
+    // gautengData = gautengInfections.find(item => item.date === date);
+    // if (!gautengData) continue;
+    // limpopoData = limpopoInfections.find(item => item.date === date);
+    // if (!limpopoData) continue;
     break;
   };
   if (!date) return alert('Oops. Invalid data set!');
@@ -152,17 +169,18 @@ function changeMapType() {
   regions.forEach(region => {
 
     // assign infections stats
-    region.count = provincialData[region.region_id] || westernCapeData[region.region_id];
+    region.count = provincialData[region.region_id] || westernCapeData[region.region_id] || gautengData[region.region_id] || limpopoData[region.region_id] || 0;
     const previousCount = provincialDataHistory[historicDataIndex][region.region_id] || westernCapeDataHistory[historicDataIndex][region.region_id];
     region.change = region.count - previousCount;
 
     // assign map polygon
     const maps = {
       map_provinces_za: provincesZa,
+      map_districts_za: districtsZa,
       map_subdistricts_za: subdistrictsZa,
       map_subdistricts_cpt: subdistrictsCpt,
     };
-    if (['WC', 'CT'].includes(region.region_id)) return;
+    if (['WC', 'CT', 'GP', 'LP'].includes(region.region_id)) return;
     if (maps[region.map_file]) region.map = maps[region.map_file].geometries[region.map_index];
     if (!region.map) return;
 
@@ -241,10 +259,33 @@ function changeMapType() {
   });  
 }
 
+function debugMap() {
+  console.log('provincesZa', provincesZa.geometries.length);
+  console.log('districtsZa', districtsZa.geometries.length);
+  console.log('subdistrictsZa', subdistrictsZa.geometries.length);
+  console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
+  districtsZa.geometries.forEach((item, index) => {
+    let points = [];
+    if (item.type === 'Polygon') {
+      points = item.coordinates[0].map(point => [point[1], point[0]]);
+    } else if (item.type === 'MultiPolygon') {
+      points = item.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
+    }
+    const poly = L.polygon(points, {
+      color: `rgba(255, 255, 255, 0.25)`,
+      fillColor: 'black',
+      fillOpacity: 0.5,
+    });
+    poly.bindTooltip(`${index}`, {permanent: true, direction:"center"}).openTooltip();
+    poly.addTo(map);
+  });
+}
+
 async function main () {
   bindMapControls();
   createMap();
   await fetchData();
   determineLatestDataDate();
   changeMapType();
+  // debugMap();
 }

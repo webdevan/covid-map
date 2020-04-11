@@ -1,5 +1,4 @@
 region_id,region_name,area,population,map_file,map_index
-UNKNOWN,Unknown,,,,
 EC,Eastern Cape,168966,6712276,map_provinces_za,0
 FS,Free State,129825,2887465,map_provinces_za,1
 GP,Gauteng Province,18178,15176115,map_provinces_za,2
@@ -42,3 +41,13 @@ GR-KN,Knysna,1109,77210,map_subdistricts_za,145
 CK-LB,Laingsburg,8784,9247,map_subdistricts_za,146
 CK-PA,Prince Albert,8153,14809,map_subdistricts_za,147
 CK-BW,Beaufort West,21917,52844,map_subdistricts_za,148
+ekurhuleni,Ekurhuleni,,3818000,map_districts_za,0
+johannesburg,Johannesburg,,5635127,map_districts_za,1
+sedibeng,Sedibeng,,935835,map_districts_za,15
+tshwane,Tshwane,,3323240,map_districts_za,17
+west-rand,West Rand,,884031,map_districts_za,16
+CP,Capricorn,,1330436,map_districts_za,31
+MP,Mopani,,1159185,map_districts_za,29
+SK,Sekhukhune,,1169762,map_districts_za,33
+VH,Vhembe,,1393949,map_districts_za,30
+WB,Waterberg,,745758,map_districts_za,32
