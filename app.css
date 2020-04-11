@@ -29,3 +29,9 @@ html {
 .map-title {
   text-align: center;
 }
+
+.map-controls {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+}
