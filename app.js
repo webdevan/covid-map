@@ -42,13 +42,12 @@ async function fetchData() {
     fetchJson('/data/map_provinces_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
     fetchJson('/data/map_subdistricts_cpt.json'),
-    // provinces data
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'),
-    // western capes data
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
   ])
   .then(res => {
-    return [
+    // set data variables
+    [
       regions,
       provincesZa,
       subdistrictsZa,
@@ -56,6 +55,9 @@ async function fetchData() {
       provincialInfections,
       westernCapeInfections,
     ] = res;
+    // clean the data
+    provincialInfections = provincialInfections.filter(row => !Object.values(row).some(item => item === null));
+    westernCapeInfections = westernCapeInfections.filter(row => !Object.values(row).some(item => item === null));
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -93,8 +95,7 @@ function bindMapControls() {
   }, false);
 }
 
-function determineDataDates() {
-  // determine latest data dates
+function determineLatestDataDate() {
   let date;
   for (let i = provincialInfections.length; i > 0; i--) {
     provincialData = provincialInfections[i - 1];
@@ -112,7 +113,7 @@ function determineDataDates() {
 }
 
 function changeMapType() {
-  // remove old map
+  // remove old map markers
   if (mapMarkers) mapMarkers.forEach(marker => map.removeLayer(marker));
   mapMarkers = [];
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
@@ -146,7 +147,7 @@ function changeMapType() {
   } else if (['change3days', 'changePercent3days'].includes(mapType)) {
     historicDataIndex = 3;
     mapType = mapType === 'change3days' ? 'change' : 'changePercent';
-  }  
+  }
 
   regions.forEach(region => {
 
@@ -185,7 +186,7 @@ function changeMapType() {
 
     // draw map marker
     let size = 22;
-    let color = '#dd000066';
+    let color = '#dd000077';
     let label = region.count;
     if (mapType === 'count') {
       if (region.count === 0) return;
@@ -195,13 +196,25 @@ function changeMapType() {
     } else if (mapType === 'change') {
       if (region.change === 0) return;
       size = 30 + Math.pow(Math.abs(region.change), 1.5) / 3;
-      if (region.change < 0) color = '#00dd0077';
+      if (region.change < 0) color = '#00dd0066';
       label = `${region.change > 0 ? '+' : ''}${region.change}`;
     } else if (mapType === 'changePercent') {
       if (region.change === 0) return;
       const percent = region.change / (region.count - region.change) * 100;
-      size = 48 + Math.pow(Math.abs(percent), 1.5) / 3;
-      if (region.change < 0) color = '#00dd0077';
+      size = 30 + Math.pow(Math.abs(percent), 1.5) / 3;
+      if (region.change < 0) color = '#00dd0066';
+      label = `${percent > 0 ? '+' : ''}${Math.round(percent)}%`;
+    } else if (mapType === 'forecast') {
+      if (region.count === 0) return;
+      const history = provincialData[region.region_id] ? provincialDataHistory : westernCapeDataHistory;
+      const values = history.map(item => item[region.region_id]);
+      if (values[0] === values[2] || values[1] === values[3]) return;
+      const multiplier = (values[0]-values[2])/(values[1]-values[3])/2;
+      const next = values[0] + ((values[0]-values[2]) * multiplier);
+      const percent = (next/values[0]-1) * 100;
+      if (Math.round(percent) === 0) return;
+      size = 30 + Math.pow(Math.abs(percent), 1.5) / 3;
+      if (percent < 0) color = '#00dd0066';
       label = `${percent > 0 ? '+' : ''}${Math.round(percent)}%`;
     } else return;
     const icon = L.divIcon({
@@ -232,9 +245,6 @@ async function main () {
   bindMapControls();
   createMap();
   await fetchData();
-  // clean the data
-  provincialInfections = provincialInfections.filter(row => !Object.values(row).some(item => item === null));
-  westernCapeInfections = westernCapeInfections.filter(row => !Object.values(row).some(item => item === null));
-  determineDataDates();
+  determineLatestDataDate();
   changeMapType();
 }
