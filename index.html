@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Covid-19 map of South Africa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous" />
     <link rel="stylesheet" href="app.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162862130-1"></script>
@@ -17,18 +18,13 @@
     <div id="map"></div>
     
     <div id="hud">
-      <p class="map-title">Fetching data, please be patient...</p>
+      <div class="map-title"><p>Fetching data, please be patient...</p></div>
       <div class="map-controls">
         <select name="mapType">
-          <option value="none" selected>No overlay</option>
-          <option value="count">Cumulative cases</option>
+          <option value="none">No overlay</option>
+          <option value="count" selected>Cumulative cases</option>
           <option value="change">New cases (1 day)</option>
-          <option value="change2days">New cases (2 days)</option>
-          <!-- <option value="change3days">New cases (3 days)</option> -->
           <option value="changePercent">Percentage increase (1 day)</option>
-          <option value="changePercent2days">Percentage increase (2 days)</option>
-          <!-- <option value="changePercent3days">Percentage increase (3 days)</option> -->
-          <!-- <option value="forecast">Forecast</option> -->
         </select>
       </div>
     </div>

@@ -1,6 +1,6 @@
 body,
 html {
-  background: black;
+  background: #d4dadc;
   height: 100%;
   margin: 0;
   font-family: -apple-system,
@@ -19,19 +19,51 @@ html {
   height: 100%;
 }
 
+.region-marker > div {
+  color: #ffffff;
+  text-shadow: 0px 0px 3px black, 0px 0px 2px black;
+  box-shadow: 0px 0px 1px 0px black;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 1em;
+  font-weight: bold;
+}
+
 #hud {
   z-index: 1000;
   position: absolute;
   bottom: 0;
   width: 100%;
+  text-align: center;
 }
 
 .map-title {
-  text-align: center;
+  max-width: 500px;
+  margin: auto;
+}
+
+.map-title > h1 {
+  font-size: 1.5em;
+  margin: 0 0 10px 0;
+}
+
+.map-title > .small {
+  font-size: 85%;
 }
 
 .map-controls {
   position: absolute;
-  top: 15px;
+  bottom: 20px;
   left: 20px;
+}
+
+@media(max-width: 1000px) {
+  .map-controls {
+    position: unset;
+    margin: 0 0 20px 0;
+  }
+}
+
+select {
+  padding: 5px 10px;
 }
