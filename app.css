@@ -14,6 +14,10 @@ html {
   sans-serif;
 }
 
+.small {
+  font-size: 75% !important;
+}
+
 #map {
   width: 100%;
   height: 100%;
@@ -47,20 +51,23 @@ html {
   margin: 0 0 10px 0;
 }
 
-.map-title > .small {
-  font-size: 85%;
-}
-
 .map-controls {
   position: absolute;
-  bottom: 20px;
   left: 20px;
+  bottom: 20px;
+}
+
+.map-credits {
+  position: absolute;
+  right: 20px;
+  bottom: 0px;
 }
 
 @media(max-width: 1000px) {
-  .map-controls {
+  .map-controls,
+  .map-credits {
     position: unset;
-    margin: 0 0 20px 0;
+    margin: 0;
   }
 }
 
