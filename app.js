@@ -7,10 +7,12 @@ var
   mapType,
   mapTypeText,
   regions,
+  countriesAfrica,
   provincesZa,
   districtsZa,
   subdistrictsZa,
   subdistrictsCpt,
+  africaInfections,
   provincialInfections,
   westernCapeInfections,
   provincialData,
@@ -41,11 +43,13 @@ function fetchJson(url) {
 
 async function fetchData() {
   return Promise.all([
-    fetchCsv('/data/regions_za.csv'),
+    fetchCsv('/data/regions.csv'),
+    fetchJson('/data/map_countries_africa.json'),
     fetchJson('/data/map_provinces_za.json'),
     fetchJson('/data/map_districts_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
     fetchJson('/data/map_subdistricts_cpt.json'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19africa/master/data/africa_daily_time_series_cases.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
@@ -55,21 +59,37 @@ async function fetchData() {
     // set data variables
     [
       regions,
+      countriesAfrica,
       provincesZa,
       districtsZa,
       subdistrictsZa,
       subdistrictsCpt,
+      africaInfections,
       provincialInfections,
       westernCapeInfections,
       gautengInfections,
       limpopoInfections,
     ] = res;
     // clean the data
+    // console.log(countriesAfrica.features.map((item, index) => `${item.properties.iso_a2},${item.properties.name_long},,${item.properties.pop_est},map_countries_africa,${index}`).join('\n'));
+    africaInfections = Object.keys(africaInfections[0])
+    .filter(field => field !== 'Country/Region')
+    .map(field => {
+      const row = {};
+      const date = field.split('/');
+      row.date = `${date[1].padStart(2, '0')}-${date[0].padStart(2, '0')}-20${date[2]}`;
+      africaInfections.forEach(item => {
+        row[item['Country/Region']] = item[field];
+      });
+      return row;
+    });
+    countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
     const cleanData = data => data = data.filter(row => !Object.values(row).some(item => item === null));
     cleanData(provincialInfections);
     cleanData(westernCapeInfections);
     cleanData(gautengInfections);
     cleanData(limpopoInfections);
+    cleanData(africaInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -81,7 +101,7 @@ function createMap() {
   map = L.map('map', {
     center: [-28.806460, 24.936116],
     zoom: 6,
-    minZoom: 5,
+    minZoom: 4,
     maxZoom: 11,
     attributionControl: false,
   });
@@ -115,8 +135,9 @@ function determineLatestDataDate() {
     westernCapeData = westernCapeInfections.find(item => item.date === date);
     if (!westernCapeData) continue;
     // for now use the last row
+    africaData = africaInfections[africaInfections.length - 1];
     gautengData = gautengInfections[gautengInfections.length - 1];
-    limpopoData = limpopoInfections[gautengInfections.length - 1];
+    limpopoData = limpopoInfections[limpopoInfections.length - 1];
     // gautengData = gautengInfections.find(item => item.date === date);
     // if (!gautengData) continue;
     // limpopoData = limpopoInfections.find(item => item.date === date);
@@ -167,23 +188,26 @@ function changeMapType() {
   }
 
   regions.forEach(region => {
-
-    // assign infections stats
-    region.count = provincialData[region.region_id] || westernCapeData[region.region_id] || gautengData[region.region_id] || limpopoData[region.region_id] || 0;
-    const previousCount = provincialDataHistory[historicDataIndex][region.region_id] || westernCapeDataHistory[historicDataIndex][region.region_id];
-    region.change = region.count - previousCount;
-
     // assign map polygon
     const maps = {
+      map_countries_africa: countriesAfrica,
       map_provinces_za: provincesZa,
       map_districts_za: districtsZa,
       map_subdistricts_za: subdistrictsZa,
       map_subdistricts_cpt: subdistrictsCpt,
     };
-    if (['WC', 'CT', 'GP', 'LP'].includes(region.region_id)) return;
+    if ([
+      'South Africa', 
+      'WC', 'LP', 'GP', 
+      'CT', 'capricorn', 'vhembe', 'mopani', 'sekhukhune', 'waterberg',
+    ].includes(region.region_id)) return;
     if (maps[region.map_file]) region.map = maps[region.map_file].geometries[region.map_index];
     if (!region.map) return;
 
+    // assign infections stats
+    region.count = africaData[region.region_id] || provincialData[region.region_id] || westernCapeData[region.region_id] || gautengData[region.region_id] || limpopoData[region.region_id] || 0;
+    const previousCount = provincialDataHistory[historicDataIndex][region.region_id] || westernCapeDataHistory[historicDataIndex][region.region_id];
+    region.change = region.count - previousCount;
     // draw map polygon
     const weightedValue = region.count / region.population * 10000;
     // const weightedValue = region.count / region.area * 100;
@@ -260,11 +284,12 @@ function changeMapType() {
 }
 
 function debugMap() {
+  console.log('countriesAfrica', countriesAfrica.geometries.length);
   console.log('provincesZa', provincesZa.geometries.length);
   console.log('districtsZa', districtsZa.geometries.length);
   console.log('subdistrictsZa', subdistrictsZa.geometries.length);
   console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
-  districtsZa.geometries.forEach((item, index) => {
+  subdistrictsZa.geometries.forEach((item, index) => {
     let points = [];
     if (item.type === 'Polygon') {
       points = item.coordinates[0].map(point => [point[1], point[0]]);
