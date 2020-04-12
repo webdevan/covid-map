@@ -110,10 +110,10 @@ function createMap() {
 
 function toRagColor(value) {
   value = Math.min(1, Math.max(0, value));
-  const red = 128 + (value * (240 - 128));
-  const green = 112 + ((1 - value) * (208 - 112));
-  const blue = '70';
-  return `rgb(${red}, ${green}, ${blue})`;
+  let hue = ((1 - value) * 90).toString(10);
+  let saturation = 100;
+  let brightness = 40 * (1 - Math.abs(value - 0.5));
+  return `hsl(${hue}, ${saturation}%, ${brightness}%)`;
 }
 
 function bindMapControls() {
