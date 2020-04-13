@@ -120,7 +120,7 @@ function createMap() {
   new L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png').addTo(map);
 }
 
-function toRagColor(value) {
+function toMapColor(value) {
   value = Math.min(1, Math.max(0, value));
   let hue = ((1 - value) * 90).toString(10);
   let saturation = 100;
@@ -206,9 +206,10 @@ function changeMapType() {
     } else if (region.map.type === 'MultiPolygon') {
       points = region.map.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
     }
+    console.log(region.region_id, toMapColor(weightedValue));
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
-      fillColor: toRagColor(weightedValue),
+      fillColor: toMapColor(weightedValue),
       fillOpacity: 0.75,
     });
     // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
