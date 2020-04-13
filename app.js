@@ -83,20 +83,26 @@ async function fetchData() {
       lpInfections,
     ] = res;
     // clean the data
-    // console.log(countriesAfrica.features.map((item, index) => `${item.properties.iso_a2},${item.properties.name_long},,${item.properties.pop_est},map_countries_africa,${index}`).join('\n'));
+    countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
     africaInfections = Object.keys(africaInfections[0])
     .filter(field => field !== 'Country/Region')
     .map(field => {
       const row = {};
       const date = field.split('/');
-      row.date = `${date[1].padStart(2, '0')}-${date[0].padStart(2, '0')}-20${date[2]}`;
+      row.date = `${date[1]}-${date[0]}-20${date[2]}`;
       africaInfections.forEach(item => {
         row[item['Country/Region']] = item[field];
       });
       return row;
     });
-    countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
-    const cleanData = data => data = data.filter(row => !Object.values(row).some(item => item === null));
+    const cleanData = data => {
+      // data = data.filter(row => !Object.values(row).some(item => item === null));
+      data = data.map(item => {
+        const date = item.date.split('-');
+        item.date = new Date(date[2], date[1]-1, date[0], 0, 0, 0, 0);
+        return item;
+      });
+    };
     cleanData(africaInfections);
     cleanData(provincialInfections);
     cleanData(wcInfections);
@@ -162,12 +168,23 @@ function findCurrentData() {
   wcData.yesterday = wcInfections[wcInfections.length - 2];
   gpData.yesterday = gpInfections[gpInfections.length - 2];
   lpData.yesterday = lpInfections[lpInfections.length - 2];
+  // sense check 1 day old data
+  const sanitizeYesterday = (data) => {
+    const cutoffDate = new Date(data.date);
+    cutoffDate.setDate(cutoffDate.getDate() - 1);
+    if (data.yesterday.date < cutoffDate) {
+      data.yesterday = data;
+    }
+  };
+  sanitizeYesterday(africaData);
+  sanitizeYesterday(provincialData);
+  sanitizeYesterday(wcData);
+  sanitizeYesterday(gpData);
+  sanitizeYesterday(lpData);
 }
 
 function formatDate(date) {
-  const dateArray = date.split('-');
-  const d = new Date(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`);
-  return new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(d);
+  return new Intl.DateTimeFormat('en-ZA', { month: 'long', day: 'numeric', year: 'numeric' }).format(date);
 }
 
 function resetMap() {
@@ -177,7 +194,7 @@ function resetMap() {
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
   mapPolygons = [];
   // set map title
-  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), Africa (${formatDate(africaData.date)})</p>`;
+  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)})</p>`;
 }
 
 function changeMapType() {
@@ -206,7 +223,6 @@ function changeMapType() {
     } else if (region.map.type === 'MultiPolygon') {
       points = region.map.coordinates.map(coordinates => coordinates[0].map(point => [point[1], point[0]]));
     }
-    console.log(region.region_id, toMapColor(weightedValue));
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
       fillColor: toMapColor(weightedValue),
