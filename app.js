@@ -86,11 +86,11 @@ async function fetchData() {
     });
     countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
     const cleanData = data => data = data.filter(row => !Object.values(row).some(item => item === null));
+    cleanData(africaInfections);
     cleanData(provincialInfections);
     cleanData(wcInfections);
     cleanData(gpInfections);
     cleanData(lpInfections);
-    cleanData(africaInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -166,7 +166,7 @@ function resetMap() {
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
   mapPolygons = [];
   // set map title
-  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">${formatDate(africaData.date)} (Africa), ${formatDate(provincialData.date)} (SA Provincial), ${formatDate(wcData.date)} (Western Cape), ${formatDate(gpData.date)} (Gauteng), ${formatDate(lpData.date)} (Limpopo)</p>`;
+  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), Africa (${formatDate(africaData.date)})</p>`;
 }
 
 function changeMapType() {
@@ -187,7 +187,7 @@ function changeMapType() {
     region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
     // draw map polygon
-    const weightedValue = region.count / region.population * 8000;
+    const weightedValue = region.count / region.population * 3000;
     // const weightedValue = region.count / region.area * 100;
     let points = [];
     if (region.map.type === 'Polygon') {
@@ -198,7 +198,7 @@ function changeMapType() {
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
       fillColor: toRagColor(weightedValue),
-      fillOpacity: 0.7,
+      fillOpacity: 0.75,
     });
     // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
     poly.addTo(map);
@@ -215,15 +215,15 @@ function changeMapType() {
       label = region.count;
     } else if (mapType === 'change') {
       if (region.change === 0) return;
-      size = Math.min(100, 30 + Math.pow(Math.abs(region.change), 1.25) / 2);
+      size = Math.min(100, 22 + Math.pow(Math.abs(region.change), 1.25) / 2);
       if (region.change < 0) color = '#00dd0066';
-      label = `${region.change > 0 ? '+' : ''}${region.change}`;
+      label = region.change;
     } else if (mapType === 'changePercent') {
       if (region.change === 0) return;
       const percent = Math.min(999, region.change / (region.count - region.change) * 100);
       size = Math.min(100, 30 + Math.pow(Math.abs(percent), 1.5) / 3);
       if (region.change < 0) color = '#00dd0066';
-      label = `${percent > 0 ? '+' : ''}${Math.round(percent)}%`;
+      label = `${Math.round(percent)}<span class="small">%</span>`;
     } else if (mapType === 'forecast') {
       if (region.count === 0) return;
       const history = provincialData[region.region_id] ? provincialDataHistory : wcDataHistory;
@@ -235,8 +235,9 @@ function changeMapType() {
       if (Math.round(percent) === 0) return;
       size = Math.min(100, 30 + Math.pow(Math.abs(percent), 1.5) / 3);
       if (percent < 0) color = '#00dd0066';
-      label = `${percent > 0 ? '+' : ''}${Math.round(percent)}%`;
+      label = `${Math.round(percent)}<span class="small">%</span>`;
     } else return;
+    size = Math.round(size);
     const icon = L.divIcon({
       className: 'region-marker',
       html: `
@@ -246,6 +247,7 @@ function changeMapType() {
       min-width: ${size}px;
       height: ${size}px;
       transform: translate(-${size/2}px, -${size/2}px);
+      font-size: ${Math.min(150, 30+size*3)}%;
       '>${label}</div>     
       `,
     });
