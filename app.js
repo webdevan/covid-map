@@ -43,7 +43,7 @@ function fetchJson(url) {
 }
 
 async function fetchData() {
-  
+  // data sources
   let promises = [
     fetchCsv('/data/regions.csv'),
     fetchJson('/data/map_countries_africa.json'),
@@ -57,15 +57,15 @@ async function fetchData() {
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
   ];
-  
+  // loading progress indicator
   const loadingMessage = document.querySelector('.loading-message');
   let progress = 0;
   promises = promises.map(p => p.then(res => {
     progress++;
-    document.querySelector('.loading-message').innerHTML = `Please be patient while downloading map resources... ${Math.round(100*progress/promises.length)}%`;
+    loadingMessage.innerHTML = `Please be patient while downloading map resources... ${Math.round(100*progress/promises.length)}%`;
     return res;
   }));
-  
+  // fetch the data
   return Promise.all(promises)
   .then(res => {
     // set data variables
@@ -129,9 +129,8 @@ function createMap() {
 function toMapColor(value) {
   value = Math.min(1, Math.max(0, value));
   let hue = ((1 - value) * 90).toString(10);
-  let saturation = 100;
   let brightness = 40 * (1 - Math.abs(value - 0.5));
-  return `hsl(${hue}, ${saturation}%, ${brightness}%)`;
+  return `hsl(${hue}, 100%, ${brightness}%)`;
 }
 
 function bindMapControls() {
@@ -168,19 +167,17 @@ function findCurrentData() {
   wcData.yesterday = wcInfections[wcInfections.length - 2];
   gpData.yesterday = gpInfections[gpInfections.length - 2];
   lpData.yesterday = lpInfections[lpInfections.length - 2];
-  // sense check 1 day old data
-  const sanitizeYesterday = (data) => {
-    const cutoffDate = new Date(data.date);
-    cutoffDate.setDate(cutoffDate.getDate() - 1);
-    if (data.yesterday.date < cutoffDate) {
-      data.yesterday = data;
-    }
+  // check data is current enough for 1 day change
+  const sanitizeOutdated = (data) => {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 3);
+    if (data.date < cutoffDate) data.yesterday = data;
   };
-  sanitizeYesterday(africaData);
-  sanitizeYesterday(provincialData);
-  sanitizeYesterday(wcData);
-  sanitizeYesterday(gpData);
-  sanitizeYesterday(lpData);
+  sanitizeOutdated(africaData);
+  sanitizeOutdated(provincialData);
+  sanitizeOutdated(wcData);
+  sanitizeOutdated(gpData);
+  sanitizeOutdated(lpData);
 }
 
 function formatDate(date) {
@@ -195,6 +192,24 @@ function resetMap() {
   mapPolygons = [];
   // set map title
   document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)})</p>`;
+}
+
+function getPolygonCentroid(pts) {
+  var first = pts[0], last = pts[pts.length-1];
+  if (first[0] != last[0] || first[1] != last[1]) pts.push(first);
+  var twicearea=0,
+  x=0, y=0,
+  nPts = pts.length,
+  p1, p2, f;
+  for ( var i=0, j=nPts-1 ; i<nPts ; j=i++ ) {
+     p1 = pts[i]; p2 = pts[j];
+     f = (p1[1] - first[1]) * (p2[0] - first[0]) - (p2[1] - first[1]) * (p1[0] - first[0]);
+     twicearea += f;
+     x += (p1[0] + p2[0] - 2 * first[0]) * f;
+     y += (p1[1] + p2[1] - 2 * first[1]) * f;
+  }
+  f = twicearea * 3;
+  return { lat: x/f + first[0], lng: y/f + first[1] };
 }
 
 function changeMapType() {
@@ -279,7 +294,9 @@ function changeMapType() {
       '>${label}</div>     
       `,
     });
-    const position = poly.getCenter();
+    
+    // const position = poly.getCenter();
+    const position = getPolygonCentroid(region.map.type === 'MultiPolygon' ? [].concat(...points) : points);
     const marker = L.marker(position, { icon }).addTo(map);
     mapMarkers.push(marker);
   });  
