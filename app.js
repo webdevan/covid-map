@@ -43,7 +43,8 @@ function fetchJson(url) {
 }
 
 async function fetchData() {
-  return Promise.all([
+  
+  let promises = [
     fetchCsv('/data/regions.csv'),
     fetchJson('/data/map_countries_africa.json'),
     fetchJson('/data/map_provinces_za.json'),
@@ -55,7 +56,17 @@ async function fetchData() {
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
-  ])
+  ];
+  
+  const loadingMessage = document.querySelector('.loading-message');
+  let progress = 0;
+  promises = promises.map(p => p.then(res => {
+    progress++;
+    document.querySelector('.loading-message').innerHTML = `Please be patient while downloading map resources... ${Math.round(100*progress/promises.length)}%`;
+    return res;
+  }));
+  
+  return Promise.all(promises)
   .then(res => {
     // set data variables
     [
