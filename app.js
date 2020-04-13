@@ -6,7 +6,6 @@ var
   mapMarkers,
   mapPolygons,
   mapType,
-  mapTypeText,
   regions,
   countriesAfrica,
   provincesZa,
@@ -120,7 +119,7 @@ function createMap() {
     center: [-28.806460, 24.936116],
     zoom: 6,
     minZoom: 3,
-    maxZoom: 11,
+    maxZoom: 13,
     attributionControl: false,
   });
   new L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png').addTo(map);
@@ -136,11 +135,9 @@ function toMapColor(value) {
 function bindMapControls() {
   const mapTypeSelect = document.querySelector('.map-controls select');
   mapType = mapTypeSelect.value;
-  mapTypeText = mapTypeSelect.querySelector(`option[value="${mapType}"]`).innerHTML;
   mapTypeSelect.addEventListener('input', event => {
     mapType = mapTypeSelect.value;
-    mapTypeText = mapTypeSelect.querySelector(`option[value="${mapType}"]`).innerHTML;
-   changeMapType();
+    changeMapType();
   }, false);
 }
 
@@ -231,7 +228,6 @@ function changeMapType() {
     region.change = region.count - region.yesterday;
     // draw map polygon
     const weightedValue = region.count / region.population * 3000;
-    // const weightedValue = region.count / region.area * 100;
     let points = [];
     if (region.map.type === 'Polygon') {
       points = region.map.coordinates[0].map(point => [point[1], point[0]]);
@@ -256,6 +252,12 @@ function changeMapType() {
       size = Math.min(100, 22 + region.count / 10);
       color = `#00000020`;
       label = region.count;
+    } else if (mapType === 'countPerCapita') {
+      if (region.count === 0) return;
+      region.perCapita = region.count / region.population * 100000;
+      size = Math.min(100, 22 + region.perCapita / 2);
+      color = `#00000020`;
+      label = Math.round(region.perCapita * 10) / 10;
     } else if (mapType === 'change') {
       if (region.change === 0) return;
       size = Math.min(100, 22 + Math.pow(Math.abs(region.change), 1.25) / 2);
