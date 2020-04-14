@@ -191,22 +191,12 @@ function resetMap() {
   document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)})</p>`;
 }
 
-function getPolygonCentroid(pts) {
-  var first = pts[0], last = pts[pts.length-1];
-  if (first[0] != last[0] || first[1] != last[1]) pts.push(first);
-  var twicearea=0,
-  x=0, y=0,
-  nPts = pts.length,
-  p1, p2, f;
-  for ( var i=0, j=nPts-1 ; i<nPts ; j=i++ ) {
-     p1 = pts[i]; p2 = pts[j];
-     f = (p1[1] - first[1]) * (p2[0] - first[0]) - (p2[1] - first[1]) * (p1[0] - first[0]);
-     twicearea += f;
-     x += (p1[0] + p2[0] - 2 * first[0]) * f;
-     y += (p1[1] + p2[1] - 2 * first[1]) * f;
+function getPolygonArea(points) {
+  let a = 0;
+  for (let i = 0, iLen = points.length - 1; i < iLen; i++) {
+    a += points[i][0] * points[i + 1][1] - points[i + 1][0] * points[i][1];
   }
-  f = twicearea * 3;
-  return { lat: x/f + first[0], lng: y/f + first[1] };
+  return Math.abs(a/2);
 }
 
 function changeMapType() {
@@ -248,24 +238,24 @@ function changeMapType() {
     let label = region.count;
     if (mapType === 'count') {
       if (region.count === 0) return;
-      size = Math.min(100, 22 + region.count / 10);
+      size = Math.min(100, 22 + region.count / 30);
       color = `#00000020`;
       label = region.count;
     } else if (mapType === 'countPerCapita') {
       if (region.count === 0) return;
       region.perCapita = region.count / region.population * 100000;
-      size = Math.min(100, 22 + region.perCapita / 2);
+      size = Math.min(100, 22 + region.perCapita / 1.5);
       color = `#00000020`;
       label = Math.round(region.perCapita * 10) / 10;
     } else if (mapType === 'change') {
       if (region.change === 0) return;
-      size = Math.min(100, 22 + Math.pow(Math.abs(region.change), 1.25) / 2);
+      size = Math.min(100, 22 + Math.abs(region.change / 2));
       if (region.change < 0) color = '#00dd0066';
       label = region.change;
     } else if (mapType === 'changePercent') {
       if (region.change === 0) return;
       const percent = Math.min(999, region.change / (region.count - region.change) * 100);
-      size = Math.min(100, 30 + Math.pow(Math.abs(percent), 1.5) / 3);
+      size = Math.min(100, 22 + Math.pow(Math.abs(percent), 0.5) * 5);
       if (region.change < 0) color = '#00dd0066';
       label = `${Math.round(percent)}<span class="small">%</span>`;
     } else if (mapType === 'forecast') {
@@ -295,8 +285,22 @@ function changeMapType() {
       '>${label}</div>     
       `,
     });
+
+    // find the center of each region
+    let polyPoints = [points];
+    if (region.map.type === 'MultiPolygon') {
+      let largestArea = 0;
+      points.forEach(item => {
+        const area = getPolygonArea(item);
+        if (area > largestArea) {
+          largestArea = area;
+          polyPoints = [item];
+        }
+      });
+    }
+    const position = polylabel(polyPoints);
     
-    const position = region.map.type === 'MultiPolygon' ? poly.getBounds().getCenter() : polylabel([points]);
+    // place marker
     const marker = L.marker(position, { icon }).addTo(map);
     mapMarkers.push(marker);
   });  
