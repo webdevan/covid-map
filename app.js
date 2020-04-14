@@ -211,7 +211,6 @@ function getPolygonCentroid(pts) {
 
 function changeMapType() {
   resetMap();
-
   regions.forEach(region => {
     // assign map polygon
     if ([
@@ -237,7 +236,7 @@ function changeMapType() {
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
       fillColor: toMapColor(weightedValue),
-      fillOpacity: 0.75,
+      fillOpacity: 0.7,
     });
     // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
     poly.addTo(map);
@@ -284,6 +283,7 @@ function changeMapType() {
     } else return;
     size = Math.round(size);
     const icon = L.divIcon({
+      iconSize: [0, 0],
       className: 'region-marker',
       html: `
       <div style='
@@ -291,14 +291,12 @@ function changeMapType() {
       line-height: ${size}px;
       min-width: ${size}px;
       height: ${size}px;
-      transform: translate(-${size/2}px, -${size/2}px);
       font-size: ${Math.min(150, 30+size*3)}%;
       '>${label}</div>     
       `,
     });
     
-    // const position = poly.getCenter();
-    const position = getPolygonCentroid(region.map.type === 'MultiPolygon' ? [].concat(...points) : points);
+    const position = region.map.type === 'MultiPolygon' ? poly.getBounds().getCenter() : polylabel([points]);
     const marker = L.marker(position, { icon }).addTo(map);
     mapMarkers.push(marker);
   });  
