@@ -312,7 +312,7 @@ function debugMap() {
   console.log('districtsZa', districtsZa.geometries.length);
   console.log('subdistrictsZa', subdistrictsZa.geometries.length);
   console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
-  subdistrictsZa.geometries.forEach((item, index) => {
+  countriesAfrica.geometries.forEach((item, index) => {
     let points = [];
     if (item.type === 'Polygon') {
       points = item.coordinates[0].map(point => [point[1], point[0]]);

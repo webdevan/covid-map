@@ -1,42 +1,42 @@
 region_id,region_name,area,population,map_file,map_index
-Burundi,Burundi,,8988091,map_countries_africa,0
-Republic of Congo,Republic of Congo,,4012809,map_countries_africa,1
-Cameroon,Cameroon,,18879301,map_countries_africa,2
+Burundi,Burundi,,8988091,map_countries_africa,1
+Republic of Congo,Republic of Congo,,4012809,map_countries_africa,9
+Cameroon,Cameroon,,18879301,map_countries_africa,7
 Burkina Faso,Burkina Faso,,15746232,map_countries_africa,3
-Benin,Benin,,8791832,map_countries_africa,4
-Côte d'Ivoire,Côte d'Ivoire,,20617068,map_countries_africa,5
-Botswana,Botswana,,1990876,map_countries_africa,6
-Central African Republic,Central African Republic,,4511488,map_countries_africa,7
+Benin,Benin,,8791832,map_countries_africa,2
+Cote d'Ivoire,Côte d'Ivoire,,20617068,map_countries_africa,6
+Botswana,Botswana,,1990876,map_countries_africa,4
+Central African Republic,Central African Republic,,4511488,map_countries_africa,5
 Democratic Republic of the Congo,Democratic Republic of the Congo,,68692542,map_countries_africa,8
-Angola,Angola,,12799293,map_countries_africa,9
+Angola,Angola,,12799293,map_countries_africa,0
 Comoros,Comoros,,752438,map_countries_africa,10
-Djibouti,Djibouti,,516055,map_countries_africa,11
-Algeria,Algeria,,34178188,map_countries_africa,12
-Cape Verde,Cape Verde,,429474,map_countries_africa,13
-Egypt,Egypt,,83082869,map_countries_africa,14
-Eritrea,Eritrea,,5647168,map_countries_africa,15
+Djibouti,Djibouti,,516055,map_countries_africa,12
+Algeria,Algeria,,34178188,map_countries_africa,13
+Cabo Verde,Cape Verde,,429474,map_countries_africa,11
+Egypt,Egypt,,83082869,map_countries_africa,15
+Eritrea,Eritrea,,5647168,map_countries_africa,14
 Ethiopia,Ethiopia,,85237338,map_countries_africa,16
 Gabon,Gabon,,1514993,map_countries_africa,17
 Ghana,Ghana,,23832495,map_countries_africa,18
 Guinea,Guinea,,10057975,map_countries_africa,19
-The Gambia,The Gambia,,1782893,map_countries_africa,20
-Libya,Libya,,6310434,map_countries_africa,21
-Guinea-Bissau,Guinea-Bissau,,1533964,map_countries_africa,22
-Equatorial Guinea,Equatorial Guinea,,650702,map_countries_africa,23
-Liberia,Liberia,,3441790,map_countries_africa,24
+Gambia,The Gambia,,1782893,map_countries_africa,20
+Libya,Libya,,6310434,map_countries_africa,24
+Guinea-Bissau,Guinea-Bissau,,1533964,map_countries_africa,21
+Equatorial Guinea,Equatorial Guinea,,650702,map_countries_africa,22
+Liberia,Liberia,,3441790,map_countries_africa,23
 Kenya,Kenya,,39002772,map_countries_africa,25
 Lesotho,Lesotho,,2130819,map_countries_africa,26
 Morocco,Morocco,,34859364,map_countries_africa,27
 Madagascar,Madagascar,,20653556,map_countries_africa,28
 Mali,Mali,,12666987,map_countries_africa,29
-Mozambique,Mozambique,,21669278,map_countries_africa,30
-Mauritania,Mauritania,,3129486,map_countries_africa,31
+Mozambique,Mozambique,,21669278,map_countries_africa,31
+Mauritania,Mauritania,,3129486,map_countries_africa,30
 Malawi,Malawi,,14268711,map_countries_africa,32
 Namibia,Namibia,,2108665,map_countries_africa,33
 Niger,Niger,,15306252,map_countries_africa,34
 Nigeria,Nigeria,,149229090,map_countries_africa,35
 Rwanda,Rwanda,,10473282,map_countries_africa,36
-Western Sahara,Western Sahara,,-99,map_countries_africa,37
+Western Sahara,Western Sahara,,582463,map_countries_africa,37
 Sudan,Sudan,,25946220,map_countries_africa,38
 South Sudan,South Sudan,,10625176,map_countries_africa,39
 Senegal,Senegal,,13711597,map_countries_africa,40
@@ -44,12 +44,12 @@ Sierra Leone,Sierra Leone,,6440053,map_countries_africa,41
 Somaliland,Somaliland,,3500000,map_countries_africa,42
 Somalia,Somalia,,9832017,map_countries_africa,43
 São Tomé and Principe,São Tomé and Principe,,212679,map_countries_africa,44
-Swaziland,Swaziland,,1123913,map_countries_africa,45
+Eswatini,Swaziland,,1123913,map_countries_africa,45
 Chad,Chad,,10329208,map_countries_africa,46
 Togo,Togo,,6019877,map_countries_africa,47
 Tunisia,Tunisia,,10486339,map_countries_africa,48
-Tanzania,Tanzania,,41048532,map_countries_africa,49
-Uganda,Uganda,,32369558,map_countries_africa,50
+Tanzania,Tanzania,,41048532,map_countries_africa,50
+Uganda,Uganda,,32369558,map_countries_africa,49
 South Africa,South Africa,,49052489,map_countries_africa,51
 Zambia,Zambia,,11862740,map_countries_africa,52
 Zimbabwe,Zimbabwe,,12619600,map_countries_africa,53
