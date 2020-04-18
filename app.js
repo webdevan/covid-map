@@ -94,8 +94,11 @@ async function fetchData() {
       });
       return row;
     });
+    lpInfections = lpInfections.map(row => {
+      const cleanRow = { date, capricorn, vhembe, mopani, sekhukhune, waterberg } = row;
+      return cleanRow;
+    });
     const cleanData = data => {
-      // data = data.filter(row => !Object.values(row).some(item => item === null));
       data = data.map(item => {
         const date = item.date.split('-');
         item.date = new Date(date[2], date[1]-1, date[0], 0, 0, 0, 0);
@@ -206,7 +209,13 @@ function changeMapType() {
     if ([
       'South Africa', 
       'WC', 'LP', 'GP', 
-      'CT', 'capricorn', 'vhembe', 'mopani', 'sekhukhune', 'waterberg',
+      'CT',
+      // 'capricorn', 'vhembe', 'mopani', 'sekhukhune', 'waterberg',
+      'polokwane', 'blouberg', 'molemole', 'Lepelle-nkumpi',
+      'musina', 'makhado', 'thulamela', 'collins chabane',
+      'Ba-phalaborwa', 'greater giyani', 'greater letaba', 'greater tzaneen', 'maruleng',
+      'elias motsoaledi', 'ephraim mogale', 'fetakgomo tubatse', 'makhuduthamaga',
+      'Bela-bela', 'lephalale', 'Modimolle-mookgophong', 'mogalakwena', 'thabazimbi',
     ].includes(region.region_id)) return;
     if (mapShapes[region.map_file]) region.map = mapShapes[region.map_file].geometries[region.map_index];
     if (!region.map) return;
