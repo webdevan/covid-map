@@ -232,7 +232,7 @@ function changeMapType() {
     region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
     // draw map polygon
-    const weightedValue = region.count / region.population * 3000;
+    const weightedValue = Math.pow(region.count / region.population * 1000, 0.6);
     let points = [];
     if (region.map.type === 'Polygon') {
       points = region.map.coordinates[0].map(point => [point[1], point[0]]);
@@ -338,7 +338,7 @@ function debugMap() {
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
       fillColor: 'black',
-      fillOpacity: 0.5,
+      fillOpacity: 0.6,
     });
     poly.bindTooltip(`${index}`, {permanent: true, direction:"center"}).openTooltip();
     poly.addTo(map);
