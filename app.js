@@ -19,6 +19,7 @@ var
   wcData,
   gpData,
   lpData,
+  nwData,
   dataDateText;
 
 function fetchCsv(url) {
@@ -30,7 +31,7 @@ function fetchCsv(url) {
   .then(res => {
     const headings = res.shift();
     return res.map(values => headings.reduce((item, key, index) => {
-      item[key] = values[index] === '' ? null : isNaN(values[index]) ? values[index] : +values[index];
+      item[key.trim()] = values[index] === '' ? null : isNaN(values[index]) ? values[index] : +values[index];
       return item;
     }, {}));
   });
@@ -55,6 +56,7 @@ async function fetchData() {
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_nw_cumulative.csv'),
   ];
   // loading progress indicator
   const loadingMessage = document.querySelector('.loading-message');
@@ -80,6 +82,7 @@ async function fetchData() {
       wcInfections,
       gpInfections,
       lpInfections,
+      nwInfections,
     ] = res;
     // clean the data
     countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
@@ -110,6 +113,7 @@ async function fetchData() {
     cleanData(wcInfections);
     cleanData(gpInfections);
     cleanData(lpInfections);
+    cleanData(nwInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -161,12 +165,14 @@ function findCurrentData() {
   wcData = wcInfections[wcInfections.length - 1];
   gpData = gpInfections[gpInfections.length - 1];
   lpData = lpInfections[lpInfections.length - 1];
+  nwData = nwInfections[nwInfections.length - 1];
   // 1 day old data
   africaData.yesterday = africaInfections[africaInfections.length - 2];
   provincialData.yesterday = provincialInfections[provincialInfections.length -2];
   wcData.yesterday = wcInfections[wcInfections.length - 2];
   gpData.yesterday = gpInfections[gpInfections.length - 2];
   lpData.yesterday = lpInfections[lpInfections.length - 2];
+  nwData.yesterday = nwInfections[nwInfections.length - 2];
   // check data is current enough for 1 day change
   const sanitizeOutdated = (data) => {
     const cutoffDate = new Date();
@@ -178,6 +184,7 @@ function findCurrentData() {
   sanitizeOutdated(wcData);
   sanitizeOutdated(gpData);
   sanitizeOutdated(lpData);
+  sanitizeOutdated(nwData);
 }
 
 function formatDate(date) {
@@ -191,7 +198,7 @@ function resetMap() {
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
   mapPolygons = [];
   // set map title
-  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)})</p>`;
+  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), North West (${formatDate(nwData.date)})</p>`;
 }
 
 function getPolygonArea(points) {
@@ -208,7 +215,7 @@ function changeMapType() {
     // assign map polygon
     if ([
       'South Africa', 
-      'WC', 'LP', 'GP', 
+      'WC', 'LP', 'GP', 'NW',
       'CT',
       // 'capricorn', 'vhembe', 'mopani', 'sekhukhune', 'waterberg',
       'polokwane', 'blouberg', 'molemole', 'Lepelle-nkumpi',
@@ -221,8 +228,8 @@ function changeMapType() {
     if (!region.map) return;
 
     // assign infections stats
-    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || 0;
-    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || 0;
+    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || 0;
+    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
     // draw map polygon
     const weightedValue = region.count / region.population * 3000;
@@ -321,7 +328,7 @@ function debugMap() {
   console.log('districtsZa', districtsZa.geometries.length);
   console.log('subdistrictsZa', subdistrictsZa.geometries.length);
   console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
-  countriesAfrica.geometries.forEach((item, index) => {
+  districtsZa.geometries.forEach((item, index) => {
     let points = [];
     if (item.type === 'Polygon') {
       points = item.coordinates[0].map(point => [point[1], point[0]]);

@@ -62,7 +62,7 @@ MP,Mapumalanga,76495,4592187,map_provinces_za,5
 NW,North-West Province,104882,4027160,map_provinces_za,7
 NC,Northern Cape,372889,1263875,map_provinces_za,6
 WC,Western Cape,129462,6844272,map_provinces_za,8
-CT,City of Cape Town,2446,4140564,map_subdistricts_za,188
+CT,City of Cape Town,2446,4233412,map_subdistricts_za,188
 CT-EA,Eastern,429.65,621703,map_subdistricts_cpt,6
 CT-KL,Khayelitsha,43.7,400753,map_subdistricts_cpt,0
 CT-KF,Klipfontein,42.75,379924,map_subdistricts_cpt,2
@@ -95,35 +95,39 @@ GR-KN,Knysna,1109,77210,map_subdistricts_za,145
 CK-LB,Laingsburg,8784,9247,map_subdistricts_za,146
 CK-PA,Prince Albert,8153,14809,map_subdistricts_za,147
 CK-BW,Beaufort West,21917,52844,map_subdistricts_za,148
-ekurhuleni,Ekurhuleni,1975,3818000,map_districts_za,0
-johannesburg,Johannesburg,1645,5635127,map_districts_za,1
-sedibeng,Sedibeng,4173,935835,map_districts_za,15
-tshwane,Tshwane,6298,3323240,map_districts_za,17
-west-rand,West Rand,4087,884031,map_districts_za,16
-capricorn,Capricorn,21705,1330436,map_districts_za,31
+ekurhuleni,Ekurhuleni,1975,3643679,map_districts_za,0
+johannesburg,Johannesburg,1645,5401173,map_districts_za,1
+sedibeng,Sedibeng,4173,1003535,map_districts_za,15
+tshwane,Tshwane,6298,3606241,map_districts_za,17
+west-rand,West Rand,4087,896159,map_districts_za,16
+capricorn,Capricorn,21705,1358841,map_districts_za,31
 polokwane,,5054,797127,map_subdistricts_za,191
 blouberg,,9540,172601,map_subdistricts_za,189
 molemole,,3628,125327,map_subdistricts_za,190
 Lepelle-nkumpi,,3484,235380,map_subdistricts_za,69
-vhembe,Vhembe,25596,1393949,map_districts_za,30
+vhembe,Vhembe,25596,1493306,map_districts_za,30
 musina,,10347,132009,map_subdistricts_za,194
 makhado,,7605,416728,map_subdistricts_za,196
 thulamela,,2642,497237,map_subdistricts_za,195
 collins chabane,,5003,347974,map_subdistricts_za,197
-mopani,Mopani,20011,1159185,map_districts_za,29
+mopani,Mopani,20011,1247693,map_districts_za,29
 Ba-phalaborwa,,7489,168937,map_subdistricts_za,67
 greater giyani,,4172,256127,map_subdistricts_za,64
 greater letaba,,1891,218030,map_subdistricts_za,65
 greater tzaneen,,2897,416146,map_subdistricts_za,66
 maruleng,,3563,99946,map_subdistricts_za,68
-sekhukhune,Sekhukhune,13528,1169762,map_districts_za,33
+sekhukhune,Sekhukhune,13528,1266928,map_districts_za,33
 elias motsoaledi,,3713,268256,map_subdistricts_za,75
 ephraim mogale,,2011,127256,map_subdistricts_za,74
 fetakgomo tubatse,,5693,489902,map_subdistricts_za,193
 makhuduthamaga,,2110,284435,map_subdistricts_za,76
-waterberg,Waterberg,44913,745758,map_districts_za,32
+waterberg,Waterberg,44913,733144,map_districts_za,32
 Bela-bela,,3406,76296,map_subdistricts_za,72
 lephalale,,13794,140240,map_subdistricts_za,71
 Modimolle-mookgophong,,10367,107699,map_subdistricts_za,192
 mogalakwena,,6156,325291,map_subdistricts_za,73
 thabazimbi,,11190,96232,map_subdistricts_za,70
+dr_ruth_segomotsi_mompati,Dr. Ruth Segomotsi Mompati,,481907,map_districts_za,44
+ngaka_modiri_molema,Ngaka Modiri Molema,,977227,map_districts_za,43
+bojanala_platinum,Bojanala Platinum,,1779141,map_districts_za,42
+dr_kenneth_kaunda,Dr. Kenneth Kaunda,,780166,map_districts_za,45
