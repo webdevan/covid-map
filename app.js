@@ -141,7 +141,7 @@ function toMapColor(value) {
 
 function bindMapControls() {
   mapType = {
-    fill: 'countPerCapita',
+    fill: 'countPerArea',
     marker: 'count',
   };
   document.querySelectorAll('.map-controls select')
@@ -251,9 +251,10 @@ function changeMapType() {
       else if (region.count === 0) weightedValue = 0;
       else weightedValue = Math.pow(region.count / region.area * 0.5, 0.25);
     } else if (mapType.fill === 'change') {
-      weightedValue = Math.pow(region.change * 0.1, 0.75) * 0.25
+      if (region.change < 1) weightedValue = 0;
+      else weightedValue = Math.pow(region.change * 0.1, 0.75) * 0.25
     } else if (mapType.fill === 'changePercent') {
-      if (region.change === 0) weightedValue = 0;
+      if (region.change < 1) weightedValue = 0;
       else if (region.count === region.change) weightedValue = 1;
       else weightedValue = Math.pow(Math.min(999, region.change / (region.count - region.change) * 100) * 0.1, 0.75) * 0.25;
     }
@@ -293,7 +294,7 @@ function changeMapType() {
       size = Math.min(100, 22 + region.perArea * 0.1);
       color = `#00000020`;
       label = Math.round(region.perArea * 10) / 10;
-      if (label === 0) return;
+      if (region.perArea === 0) return;
     } else if (mapType.marker === 'change') {
       if (region.change === 0) return;
       size = Math.min(100, 22 + Math.abs(region.change / 2));
