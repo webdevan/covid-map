@@ -68,7 +68,7 @@ html {
   bottom: 0px;
 }
 
-@media(max-width: 1000px) {
+@media(max-width: 1360px) {
   .map-controls,
   .map-credits {
     position: unset;

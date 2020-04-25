@@ -24,10 +24,19 @@
         <p class="loading-message">&nbsp;</p>
       </div>
       <div class="map-controls">
-        <select name="mapType">
-          <option value="none">No overlay</option>
-          <option value="count" selected>Cumulative cases</option>
+        <select name="fill">
+          <option value="none">No map fill</option>
           <option value="countPerCapita">Cases per 100,000 people</option>
+          <option value="countPerArea" selected>Cases per 100km²</option>
+          <option value="count">Cumulative cases</option>
+          <option value="change">New cases (last day)</option>
+          <option value="changePercent">% increase (last day)</option>
+        </select>
+        <select name="marker">
+          <option value="none">No map markers</option>
+          <option value="countPerCapita">Cases per 100,000 people</option>
+          <option value="countPerArea">Cases per 100km²</option>
+          <option value="count">Cumulative cases</option>
           <option value="change">New cases (last day)</option>
           <option value="changePercent">% increase (last day)</option>
         </select>

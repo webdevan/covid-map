@@ -2,10 +2,10 @@ main();
 
 var
   map,
+  mapType,
   mapShapes,
   mapMarkers,
   mapPolygons,
-  mapType,
   regions,
   countriesAfrica,
   provincesZa,
@@ -140,12 +140,18 @@ function toMapColor(value) {
 }
 
 function bindMapControls() {
-  const mapTypeSelect = document.querySelector('.map-controls select');
-  mapType = mapTypeSelect.value;
-  mapTypeSelect.addEventListener('input', event => {
-    mapType = mapTypeSelect.value;
-    changeMapType();
-  }, false);
+  mapType = {
+    fill: 'countPerCapita',
+    marker: 'count',
+  };
+  document.querySelectorAll('.map-controls select')
+  .forEach(select => {
+    select.value = mapType[select.name];
+    select.addEventListener('input', event => {
+      mapType[select.name] = select.value;
+      changeMapType();
+    }, false);
+  });
 }
 
 function setMapShapes() {
@@ -231,8 +237,26 @@ function changeMapType() {
     region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || 0;
     region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
+    
     // draw map polygon
-    const weightedValue = Math.pow(region.count / region.population * 1000, 0.6);
+    let weightedValue = 0;
+    if (mapType.fill === 'none') {
+      weightedValue = false;
+    } else if (mapType.fill === 'count') {
+      weightedValue = Math.pow(region.count / 3000, 0.6);
+    } else if (mapType.fill === 'countPerCapita') {
+      weightedValue = Math.pow(region.count / region.population * 1000, 0.6);
+    } else if (mapType.fill === 'countPerArea') {
+      if (!region.area) weightedValue = false; 
+      else if (region.count === 0) weightedValue = 0;
+      else weightedValue = Math.pow(region.count / region.area * 0.5, 0.25);
+    } else if (mapType.fill === 'change') {
+      weightedValue = Math.pow(region.change * 0.1, 0.75) * 0.25
+    } else if (mapType.fill === 'changePercent') {
+      if (region.change === 0) weightedValue = 0;
+      else if (region.count === region.change) weightedValue = 1;
+      else weightedValue = Math.pow(Math.min(999, region.change / (region.count - region.change) * 100) * 0.1, 0.75) * 0.25;
+    }
     let points = [];
     if (region.map.type === 'Polygon') {
       points = region.map.coordinates[0].map(point => [point[1], point[0]]);
@@ -241,10 +265,9 @@ function changeMapType() {
     }
     const poly = L.polygon(points, {
       color: `rgba(255, 255, 255, 0.25)`,
-      fillColor: toMapColor(weightedValue),
+      fillColor: weightedValue === false ? 'transparent' : toMapColor(weightedValue),
       fillOpacity: 0.7,
     });
-    // poly.bindTooltip(`${region.count} +${region.change}`, {permanent: true, direction:"center"}).openTooltip();
     poly.addTo(map);
     mapPolygons.push(poly);
 
@@ -252,41 +275,39 @@ function changeMapType() {
     let size = 22;
     let color = '#dd000077';
     let label = region.count;
-    if (mapType === 'count') {
+    if (mapType.marker === 'count') {
       if (region.count === 0) return;
       size = Math.min(100, 22 + region.count / 30);
       color = `#00000020`;
       label = region.count;
-    } else if (mapType === 'countPerCapita') {
+    } else if (mapType.marker === 'countPerCapita') {
       if (region.count === 0) return;
       region.perCapita = region.count / region.population * 100000;
       size = Math.min(100, 22 + region.perCapita / 1.5);
       color = `#00000020`;
       label = Math.round(region.perCapita * 10) / 10;
-    } else if (mapType === 'change') {
+    } else if (mapType.marker === 'countPerArea') {
+      if (!region.area) return;
+      if (region.count === 0) return;
+      region.perArea = region.count / region.area * 100;
+      size = Math.min(100, 22 + region.perArea * 0.1);
+      color = `#00000020`;
+      label = Math.round(region.perArea * 10) / 10;
+      if (label === 0) return;
+    } else if (mapType.marker === 'change') {
       if (region.change === 0) return;
       size = Math.min(100, 22 + Math.abs(region.change / 2));
       if (region.change < 0) color = '#00dd0066';
       label = region.change;
-    } else if (mapType === 'changePercent') {
+    } else if (mapType.marker === 'changePercent') {
       if (region.change === 0) return;
       const percent = Math.min(999, region.change / (region.count - region.change) * 100);
       size = Math.min(100, 22 + Math.pow(Math.abs(percent), 0.5) * 5);
       if (region.change < 0) color = '#00dd0066';
       label = `${Math.round(percent)}<span class="small">%</span>`;
-    } else if (mapType === 'forecast') {
-      if (region.count === 0) return;
-      const history = provincialData[region.region_id] ? provincialDataHistory : wcDataHistory;
-      const values = history.map(item => item[region.region_id]);
-      if (values[0] === values[2] || values[1] === values[3]) return;
-      const multiplier = (values[0]-values[2])/(values[1]-values[3])/2;
-      const next = values[0] + ((values[0]-values[2]) * multiplier);
-      const percent = (next/values[0]-1) * 100;
-      if (Math.round(percent) === 0) return;
-      size = Math.min(100, 30 + Math.pow(Math.abs(percent), 1.5) / 3);
-      if (percent < 0) color = '#00dd0066';
-      label = `${Math.round(percent)}<span class="small">%</span>`;
     } else return;
+
+    // create map marker
     size = Math.round(size);
     const icon = L.divIcon({
       iconSize: [0, 0],
