@@ -287,6 +287,7 @@ function changeMapType() {
       size = Math.min(100, 22 + region.perCapita / 1.5);
       color = `#00000020`;
       label = Math.round(region.perCapita * 10) / 10;
+      if (label === 0) return;
     } else if (mapType.marker === 'countPerArea') {
       if (!region.area) return;
       if (region.count === 0) return;
@@ -294,18 +295,18 @@ function changeMapType() {
       size = Math.min(100, 22 + region.perArea * 0.1);
       color = `#00000020`;
       label = Math.round(region.perArea * 10) / 10;
-      if (region.perArea === 0) return;
+      if (label === 0) return;
     } else if (mapType.marker === 'change') {
       if (region.change === 0) return;
       size = Math.min(100, 22 + Math.abs(region.change / 2));
       if (region.change < 0) color = '#00dd0066';
-      label = region.change;
+      label = (region.change > 0 ? '+': '') + region.change;
     } else if (mapType.marker === 'changePercent') {
       if (region.change === 0) return;
       const percent = Math.min(999, region.change / (region.count - region.change) * 100);
       size = Math.min(100, 22 + Math.pow(Math.abs(percent), 0.5) * 5);
       if (region.change < 0) color = '#00dd0066';
-      label = `${Math.round(percent)}<span class="small">%</span>`;
+      label = `${(percent > 0 ? '+' : '') + Math.round(percent)}<span class="small">%</span>`;
     } else return;
 
     // create map marker
@@ -319,7 +320,7 @@ function changeMapType() {
       line-height: ${size}px;
       min-width: ${size}px;
       height: ${size}px;
-      font-size: ${Math.min(150, 30+size*3)}%;
+      font-size: ${Math.min(150, 30+size*2.5)}%;
       '>${label}</div>     
       `,
     });
