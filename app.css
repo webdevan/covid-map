@@ -40,6 +40,7 @@ html {
   bottom: 0;
   width: 100%;
   text-align: center;
+  pointer-events: none;
 }
 
 .map-title {
@@ -60,12 +61,14 @@ html {
   position: absolute;
   left: 20px;
   bottom: 20px;
+  pointer-events: all;
 }
 
 .map-credits {
   position: absolute;
   right: 20px;
   bottom: 0px;
+  pointer-events: all;
 }
 
 @media(max-width: 1360px) {

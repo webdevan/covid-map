@@ -245,11 +245,11 @@ function changeMapType() {
     } else if (mapType.fill === 'count') {
       weightedValue = Math.pow(region.count / 3000, 0.6);
     } else if (mapType.fill === 'countPerCapita') {
-      weightedValue = Math.pow(region.count / region.population * 1000, 0.6);
+      weightedValue = Math.pow(region.count / region.population * 800, 0.8);
     } else if (mapType.fill === 'countPerArea') {
       if (!region.area) weightedValue = false; 
       else if (region.count === 0) weightedValue = 0;
-      else weightedValue = Math.pow(region.count / region.area * 0.5, 0.25);
+      else weightedValue = Math.pow(region.count / region.area * 0.075, 0.3);
     } else if (mapType.fill === 'change') {
       if (region.change < 1) weightedValue = 0;
       else weightedValue = Math.pow(region.change * 0.1, 0.75) * 0.25
@@ -288,6 +288,7 @@ function changeMapType() {
       color = `#00000020`;
       label = Math.round(region.perCapita * 10) / 10;
       if (label === 0) return;
+      if (label > 10) label = Math.round(label);
     } else if (mapType.marker === 'countPerArea') {
       if (!region.area) return;
       if (region.count === 0) return;
@@ -296,15 +297,16 @@ function changeMapType() {
       color = `#00000020`;
       label = Math.round(region.perArea * 10) / 10;
       if (label === 0) return;
+      if (label > 10) label = Math.round(label);
     } else if (mapType.marker === 'change') {
       if (region.change === 0) return;
-      size = Math.min(100, 22 + Math.abs(region.change / 2));
+      size = Math.min(100, 22 + Math.abs(region.change / 2.5));
       if (region.change < 0) color = '#00dd0066';
       label = (region.change > 0 ? '+': '') + region.change;
     } else if (mapType.marker === 'changePercent') {
       if (region.change === 0) return;
       const percent = Math.min(999, region.change / (region.count - region.change) * 100);
-      size = Math.min(100, 22 + Math.pow(Math.abs(percent), 0.5) * 5);
+      size = Math.min(100, 22 + Math.pow(Math.min(66, Math.abs(percent)), 0.5) * 5);
       if (region.change < 0) color = '#00dd0066';
       label = `${(percent > 0 ? '+' : '') + Math.round(percent)}<span class="small">%</span>`;
     } else return;
