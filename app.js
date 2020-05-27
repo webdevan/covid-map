@@ -98,8 +98,9 @@ async function fetchData() {
       return row;
     });
     lpInfections = lpInfections.map(row => {
-      const cleanRow = { date, capricorn, vhembe, mopani, sekhukhune, waterberg } = row;
-      return cleanRow;
+      const date = row.date.split('-');
+      row.date = `${date[2]}-${date[1]}-${date[0]}`;
+      return row;
     });
     const cleanData = data => {
       data = data.map(item => {
@@ -179,18 +180,6 @@ function findCurrentData() {
   gpData.yesterday = gpInfections[gpInfections.length - 2];
   lpData.yesterday = lpInfections[lpInfections.length - 2];
   nwData.yesterday = nwInfections[nwInfections.length - 2];
-  // check data is current enough for 1 day change
-  const sanitizeOutdated = (data) => {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 3);
-    if (data.date < cutoffDate) data.yesterday = data;
-  };
-  sanitizeOutdated(africaData);
-  sanitizeOutdated(provincialData);
-  sanitizeOutdated(wcData);
-  sanitizeOutdated(gpData);
-  sanitizeOutdated(lpData);
-  sanitizeOutdated(nwData);
 }
 
 function formatDate(date) {
@@ -223,12 +212,7 @@ function changeMapType() {
       'South Africa', 
       'WC', 'LP', 'GP', 'NW',
       'CT',
-      // 'capricorn', 'vhembe', 'mopani', 'sekhukhune', 'waterberg',
-      'polokwane', 'blouberg', 'molemole', 'Lepelle-nkumpi',
-      'musina', 'makhado', 'thulamela', 'collins chabane',
-      'Ba-phalaborwa', 'greater giyani', 'greater letaba', 'greater tzaneen', 'maruleng',
-      'elias motsoaledi', 'ephraim mogale', 'fetakgomo tubatse', 'makhuduthamaga',
-      'Bela-bela', 'lephalale', 'Modimolle-mookgophong', 'mogalakwena', 'thabazimbi',
+      'DC33', 'DC34', 'DC35', 'DC36', 'DC47',
     ].includes(region.region_id)) return;
     if (mapShapes[region.map_file]) region.map = mapShapes[region.map_file].geometries[region.map_index];
     if (!region.map) return;
