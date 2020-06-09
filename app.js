@@ -118,7 +118,6 @@ async function fetchData() {
     cleanData(lpInfections);
     cleanData(nwInfections);
     cleanData(mpInfections);
-    console.log(mpInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -146,7 +145,7 @@ function toMapColor(value) {
 
 function bindMapControls() {
   mapType = {
-    fill: 'countPerArea',
+    fill: 'countPerCapita',
     marker: 'count',
   };
   document.querySelectorAll('.map-controls select')
@@ -235,11 +234,11 @@ function changeMapType() {
     } else if (mapType.fill === 'count') {
       weightedValue = Math.pow(region.count / 3000, 0.6);
     } else if (mapType.fill === 'countPerCapita') {
-      weightedValue = Math.pow(region.count / region.population * 800, 0.8);
+      weightedValue = Math.pow(region.count / region.population * 100, 0.5);
     } else if (mapType.fill === 'countPerArea') {
       if (!region.area) weightedValue = false; 
       else if (region.count === 0) weightedValue = 0;
-      else weightedValue = Math.pow(region.count / region.area * 0.075, 0.3);
+      else weightedValue = Math.pow(region.count / region.area * 0.075, 0.25);
     } else if (mapType.fill === 'change') {
       if (region.change < 1) weightedValue = 0;
       else weightedValue = Math.pow(region.change * 0.1, 0.75) * 0.25
@@ -268,7 +267,7 @@ function changeMapType() {
     let label = region.count;
     if (mapType.marker === 'count') {
       if (region.count === 0) return;
-      size = Math.min(100, 22 + region.count / 30);
+      size = Math.min(100, 22 + region.count / 100);
       color = `#00000020`;
       label = region.count;
     } else if (mapType.marker === 'countPerCapita') {
