@@ -57,6 +57,7 @@ async function fetchData() {
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_nw_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_mp_cumulative.csv'),
   ];
   // loading progress indicator
   const loadingMessage = document.querySelector('.loading-message');
@@ -83,6 +84,7 @@ async function fetchData() {
       gpInfections,
       lpInfections,
       nwInfections,
+      mpInfections,
     ] = res;
     // clean the data
     countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
@@ -115,6 +117,8 @@ async function fetchData() {
     cleanData(gpInfections);
     cleanData(lpInfections);
     cleanData(nwInfections);
+    cleanData(mpInfections);
+    console.log(mpInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -173,6 +177,7 @@ function findCurrentData() {
   gpData = gpInfections[gpInfections.length - 1];
   lpData = lpInfections[lpInfections.length - 1];
   nwData = nwInfections[nwInfections.length - 1];
+  mpData = mpInfections[mpInfections.length - 1];
   // 1 day old data
   africaData.yesterday = africaInfections[africaInfections.length - 2];
   provincialData.yesterday = provincialInfections[provincialInfections.length -2];
@@ -180,6 +185,7 @@ function findCurrentData() {
   gpData.yesterday = gpInfections[gpInfections.length - 2];
   lpData.yesterday = lpInfections[lpInfections.length - 2];
   nwData.yesterday = nwInfections[nwInfections.length - 2];
+  mpData.yesterday = mpInfections[mpInfections.length - 2];
 }
 
 function formatDate(date) {
@@ -193,7 +199,7 @@ function resetMap() {
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
   mapPolygons = [];
   // set map title
-  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), North West (${formatDate(nwData.date)})</p>`;
+  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), North West (${formatDate(nwData.date)}), Mpumalanga (${formatDate(mpData.date)})</p>`;
 }
 
 function getPolygonArea(points) {
@@ -210,7 +216,7 @@ function changeMapType() {
     // assign map polygon
     if ([
       'South Africa', 
-      'WC', 'LP', 'GP', 'NW',
+      'WC', 'LP', 'GP', 'NW', 'MP',
       'CT',
       'DC33', 'DC34', 'DC35', 'DC36', 'DC47',
     ].includes(region.region_id)) return;
@@ -218,8 +224,8 @@ function changeMapType() {
     if (!region.map) return;
 
     // assign infections stats
-    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || 0;
-    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || 0;
+    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || mpData[region.region_id] || 0;
+    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || mpData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
     
     // draw map polygon
@@ -337,7 +343,7 @@ function debugMap() {
   console.log('districtsZa', districtsZa.geometries.length);
   console.log('subdistrictsZa', subdistrictsZa.geometries.length);
   console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
-  districtsZa.geometries.forEach((item, index) => {
+  subdistrictsZa.geometries.forEach((item, index) => {
     let points = [];
     if (item.type === 'Polygon') {
       points = item.coordinates[0].map(point => [point[1], point[0]]);
