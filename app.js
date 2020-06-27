@@ -111,6 +111,7 @@ async function fetchData() {
         return item;
       });
     };
+    mpInfections = mpInfections.filter(row => row.bushbuckridge !== null);
     cleanData(africaInfections);
     cleanData(provincialInfections);
     cleanData(wcInfections);
