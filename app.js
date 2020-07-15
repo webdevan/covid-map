@@ -20,6 +20,9 @@ var
   gpData,
   lpData,
   nwData,
+  fsData,
+  ncData,
+  kznData,
   dataDateText;
 
 function fetchCsv(url) {
@@ -58,6 +61,9 @@ async function fetchData() {
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_lp_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_nw_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_mp_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_fs_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_nc_cumulative.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_kzn_cumulative.csv'),
   ];
   // loading progress indicator
   const loadingMessage = document.querySelector('.loading-message');
@@ -85,6 +91,9 @@ async function fetchData() {
       lpInfections,
       nwInfections,
       mpInfections,
+      fsInfections,
+      ncInfections,
+      kznInfections,
     ] = res;
     // clean the data
     countriesAfrica.geometries = countriesAfrica.features.map(item => item.geometry);
@@ -104,6 +113,19 @@ async function fetchData() {
       row.date = `${date[2]}-${date[1]}-${date[0]}`;
       return row;
     });
+    mpInfections = mpInfections.filter(row => row.bushbuckridge !== null);
+    ncInfections = ncInfections.map(row => {
+      row.date = row.Date;
+      Object.keys(row).forEach(key => {
+        row[key.replace('-Cases', '')] = row[key];
+      });
+      return row;
+    });
+    kznInfections = kznInfections.map(row => {
+      const date = row.date.split('-');
+      row.date = `${date[2]}-${date[1]}-${date[0]}`;
+      return row;
+    });
     const cleanData = data => {
       data = data.map(item => {
         const date = item.date.split('-');
@@ -111,7 +133,6 @@ async function fetchData() {
         return item;
       });
     };
-    mpInfections = mpInfections.filter(row => row.bushbuckridge !== null);
     cleanData(africaInfections);
     cleanData(provincialInfections);
     cleanData(wcInfections);
@@ -119,6 +140,9 @@ async function fetchData() {
     cleanData(lpInfections);
     cleanData(nwInfections);
     cleanData(mpInfections);
+    cleanData(fsInfections);
+    cleanData(ncInfections);
+    cleanData(kznInfections);
   })
   .catch(err => {
     alert('Oops! Something is wrong.');
@@ -178,6 +202,9 @@ function findCurrentData() {
   lpData = lpInfections[lpInfections.length - 1];
   nwData = nwInfections[nwInfections.length - 1];
   mpData = mpInfections[mpInfections.length - 1];
+  fsData = fsInfections[fsInfections.length - 1];
+  ncData = ncInfections[ncInfections.length - 1];
+  kznData = kznInfections[kznInfections.length - 1];
   // 1 day old data
   africaData.yesterday = africaInfections[africaInfections.length - 2];
   provincialData.yesterday = provincialInfections[provincialInfections.length -2];
@@ -186,6 +213,9 @@ function findCurrentData() {
   lpData.yesterday = lpInfections[lpInfections.length - 2];
   nwData.yesterday = nwInfections[nwInfections.length - 2];
   mpData.yesterday = mpInfections[mpInfections.length - 2];
+  fsData.yesterday = fsInfections[fsInfections.length - 2];
+  ncData.yesterday = ncInfections[ncInfections.length - 2];
+  kznData.yesterday = kznInfections[kznInfections.length - 2];
 }
 
 function formatDate(date) {
@@ -199,7 +229,7 @@ function resetMap() {
   if (mapPolygons) mapPolygons.forEach(polygon => map.removeLayer(polygon));
   mapPolygons = [];
   // set map title
-  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), North West (${formatDate(nwData.date)}), Mpumalanga (${formatDate(mpData.date)})</p>`;
+  document.querySelector('.map-title').innerHTML = `<h1>Covid-19 positive cases in Africa</h1><p class="small">Africa (${formatDate(africaData.date)}), SA Provincial (${formatDate(provincialData.date)}), Western Cape (${formatDate(wcData.date)}), Gauteng (${formatDate(gpData.date)}), Limpopo (${formatDate(lpData.date)}), North West (${formatDate(nwData.date)}), Mpumalanga (${formatDate(mpData.date)}), Freestate (${formatDate(fsData.date)}), Northern Cape (${formatDate(ncData.date)}), KwaZulu-Natal (${formatDate(kznData.date)})</p>`;
 }
 
 function getPolygonArea(points) {
@@ -216,7 +246,7 @@ function changeMapType() {
     // assign map polygon
     if ([
       'South Africa', 
-      'WC', 'LP', 'GP', 'NW', 'MP',
+      'WC', 'LP', 'GP', 'NW', 'MP', 'FS', 'NC', 'KZN',
       'CT',
       'DC33', 'DC34', 'DC35', 'DC36', 'DC47',
     ].includes(region.region_id)) return;
@@ -224,8 +254,8 @@ function changeMapType() {
     if (!region.map) return;
 
     // assign infections stats
-    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || mpData[region.region_id] || 0;
-    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || mpData.yesterday[region.region_id] || 0;
+    region.count = africaData[region.region_id] || provincialData[region.region_id] || wcData[region.region_id] || gpData[region.region_id] || lpData[region.region_id] || nwData[region.region_id] || mpData[region.region_id] || fsData[region.region_id] || ncData[region.region_id] || kznData[region.region_id] || 0;
+    region.yesterday = africaData.yesterday[region.region_id] || provincialData.yesterday[region.region_id] || wcData.yesterday[region.region_id] || gpData.yesterday[region.region_id] || lpData.yesterday[region.region_id] || nwData.yesterday[region.region_id] || mpData.yesterday[region.region_id] || fsData.yesterday[region.region_id] || ncData.yesterday[region.region_id] || kznData.yesterday[region.region_id] || 0;
     region.change = region.count - region.yesterday;
     
     // draw map polygon
@@ -343,7 +373,7 @@ function debugMap() {
   console.log('districtsZa', districtsZa.geometries.length);
   console.log('subdistrictsZa', subdistrictsZa.geometries.length);
   console.log('subdistrictsCpt', subdistrictsCpt.geometries.length);
-  subdistrictsZa.geometries.forEach((item, index) => {
+  districtsZa.geometries.forEach((item, index) => {
     let points = [];
     if (item.type === 'Polygon') {
       points = item.coordinates[0].map(point => [point[1], point[0]]);

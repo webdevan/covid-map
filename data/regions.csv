@@ -52,15 +52,15 @@ Uganda,Uganda,236040,44269594,map_countries_africa,49
 Western Sahara,Western Sahara,266000,582463,map_countries_africa,37
 Zambia,Zambia,752614,17861030,map_countries_africa,52
 Zimbabwe,Zimbabwe,390757,14645468,map_countries_africa,53
-EC,Eastern Cape,168966,6712276,map_provinces_za,0
-FS,Free State,129825,2887465,map_provinces_za,1
-GP,Gauteng Province,18178,15176115,map_provinces_za,2
-KZN,Kwa-Zulu Natal,94361,11289086,map_provinces_za,3
-LP,Limpopo,125754,5982584,map_provinces_za,4
-MP,Mapumalanga,76495,4592187,map_provinces_za,5
-NW,North-West Province,104882,4027160,map_provinces_za,7
-NC,Northern Cape,372889,1263875,map_provinces_za,6
-WC,Western Cape,129462,6844272,map_provinces_za,8
+EC,Eastern Cape,168966,6734001,map_provinces_za,0
+FS,Free State,129825,2928903,map_provinces_za,1
+GP,Gauteng Province,18178,15488137,map_provinces_za,2
+KZN,Kwa-Zulu Natal,94361,11531628,map_provinces_za,3
+LP,Limpopo,125754,5852553,map_provinces_za,4
+MP,Mapumalanga,76495,4679786,map_provinces_za,5
+NW,North-West Province,104882,4108816,map_provinces_za,7
+NC,Northern Cape,372889,1292786,map_provinces_za,6
+WC,Western Cape,129462,7005741,map_provinces_za,8
 CT,City of Cape Town,2446,4233412,map_subdistricts_za,188
 CT-EA,Eastern,429.65,621703,map_subdistricts_cpt,6
 CT-KL,Khayelitsha,43.7,400753,map_subdistricts_cpt,0
@@ -147,3 +147,24 @@ pixley_ka_seme,pixley_ka_seme,5227,85549,map_subdistricts_za,80
 steve_tshwete,steve_tshwete,3976,352775,map_subdistricts_za,86
 thembisile_hani,thembisile_hani,2384,368553,map_subdistricts_za,88
 victor_khanye,victor_khanye,1568,98146,map_subdistricts_za,84
+fezile_dabi,fezile_dabi,20668,509520,map_districts_za,13
+lejweleputswa,lejweleputswa,31930,677535,map_districts_za,11
+mangaung,mangaung,6284,800201,map_districts_za,14
+xhariep,xhariep,37674,1333124,map_districts_za,10
+thabo_mofutsanyana,thabo_mofutsanyana,33269,800201,map_districts_za,12
+Francis Baard,Francis Baard,12836,381764,map_districts_za,41
+Namakwa,Namakwa,126836,113317,map_districts_za,38
+Pixley Ka Seme,Pixley Ka Seme,103410,213607,map_districts_za,39
+ZF Mgcawu,ZF Mgcawu,102524,269163,map_districts_za,40
+John Taolo Gaetswe,John Taolo Gaetswe,27283,248423,map_districts_za,37
+Amajuba,Amajuba,6911,595573,map_districts_za,22
+eThekwini,eThekwini,2292,3848515,map_districts_za,28
+Harry Gwala,Harry Gwala,10547,526956,map_districts_za,27
+iLembe,iLembe,3269,724200,map_districts_za,26
+King Cetshwayo,King Cetshwayo,8213,1016001,map_districts_za,25
+Ugu,Ugu,5047,799522,map_districts_za,18
+Umgungundlovu,Umgungundlovu,9513,1191332,map_districts_za,19
+Umkhanyakude,Umkhanyakude,12821,711176,map_districts_za,24
+Umzinyathi,Umzinyathi,8589,586402,map_districts_za,21
+Uthukela,Uthukela,11326,773120,map_districts_za,20
+Zululand,Zululand,14799,904345,map_districts_za,23
