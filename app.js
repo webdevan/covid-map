@@ -51,7 +51,7 @@ async function fetchData() {
     fetchJson('/data/map_districts_za.json'),
     fetchJson('/data/map_subdistricts_za.json'),
     fetchJson('/data/map_subdistricts_cpt.json'),
-    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19africa/master/covid-data/africa_daily_time_series_cases.csv'),
+    fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19africa/master/data/time_series/africa_daily_time_series_cases.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_wc_cumulative.csv'),
     fetchCsv('https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/provincial_gp_cumulative.csv'),

@@ -7,12 +7,12 @@ Burkina Faso,Burkina Faso,274000,20321378,map_countries_africa,3
 Burundi,Burundi,27830,10864245,map_countries_africa,1
 Cameroon,Cameroon,475442,25876380,map_countries_africa,7
 Cabo Verde,Cape Verde,4033,549935,map_countries_africa,11
-Central African Republic,Central African Republic,622984,4745185,map_countries_africa,5
+CAR,Central African Republic,622984,4745185,map_countries_africa,5
 Chad,Chad,1284000,15946876,map_countries_africa,46
 Comoros,Comoros,2235,850886,map_countries_africa,10
-Republic of Congo,Republic of Congo,2344858,5380508,map_countries_africa,9
+Congo,Republic of Congo,2344858,5380508,map_countries_africa,9
 Djibouti,Djibouti,23200,973560,map_countries_africa,12
-Congo (Kinshasa),Democratic Republic of the Congo,342000,86790567,map_countries_africa,8
+DRC,Democratic Republic of the Congo,342000,86790567,map_countries_africa,8
 Egypt,Egypt,1001449,100388073,map_countries_africa,15
 Equatorial Guinea,Equatorial Guinea,28051,1355986,map_countries_africa,22
 Eritrea,Eritrea,117600,3497117,map_countries_africa,14
@@ -23,7 +23,7 @@ Gambia,The Gambia,10380,2347706,map_countries_africa,20
 Ghana,Ghana,238534,28833629,map_countries_africa,18
 Guinea,Guinea,245857,12771246,map_countries_africa,19
 Guinea-Bissau,Guinea-Bissau,36125,1920922,map_countries_africa,21
-Cote d'Ivoire,Côte d'Ivoire,322460,25716544,map_countries_africa,6
+Ivory Coast,Côte d'Ivoire,322460,25716544,map_countries_africa,6
 Kenya,Kenya,580367,52573973,map_countries_africa,25
 Lesotho,Lesotho,30355,2125268,map_countries_africa,26
 Liberia,Liberia,111369,4937374,map_countries_africa,23
@@ -41,7 +41,6 @@ Rwanda,Rwanda,26798,12626950,map_countries_africa,36
 São Tomé and Principe,São Tomé and Principe,964,215056,map_countries_africa,44
 Senegal,Senegal,196723,16296364,map_countries_africa,40
 Sierra Leone,Sierra Leone,71740,7813215,map_countries_africa,41
-Somaliland,Somaliland,176120,3508000,map_countries_africa,42
 Somalia,Somalia,637657,15442905,map_countries_africa,43
 South Africa,South Africa,1221037,58558270,map_countries_africa,51
 South Sudan,South Sudan,644329,11062113,map_countries_africa,39
